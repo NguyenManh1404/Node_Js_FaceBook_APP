@@ -62,4 +62,4 @@ let schema = new mongoose.Schema(
 );
 
 
-module.exports = mongoose.model('app.user', schema);
+module.exports = mongoose.model('user', schema);

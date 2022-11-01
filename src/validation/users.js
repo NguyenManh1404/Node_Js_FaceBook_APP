@@ -16,14 +16,24 @@ const register = [
     min: 6,
   }),
   check("phoneNumber", "Invalid mobile number.").notEmpty(),
-    // .isLength({ min: 11, max: 11 }),
-    // .matches(/^(09|\+639)\d{9}$/),
+  check("phoneNumber", "Invalid mobile number.").isLength({ min: 10, max: 11 }),
+  check("phoneNumber", "Invalid mobile number").matches(
+    /(84|0[3|5|7|8|9])+([0-9]{8})\b/
+  ),
   check("confirmPassword", "Confirm password is required").notEmpty(),
   check(
     "confirmPassword",
     "Confirm password must be at least 6 characters"
   ).isLength({ min: 6 }),
 ];
+
+const login = [
+  check("email", "Email is required").notEmpty(),
+  check("email", "Invalid email.").isEmail(),
+  check("password", "Password is required").notEmpty(),
+];
+
+
 //{
 //     "firstName": "firstName",
 //     "lastName": "lastName",
@@ -34,6 +44,6 @@ const register = [
 
 // }
 
-const validator = { register };
+const validator = { register, login };
 
 module.exports = validator;

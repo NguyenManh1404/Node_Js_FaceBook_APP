@@ -1,18 +1,11 @@
 const Post = require('../../models/Post');
 const { validationResult } = require('express-validator');
 
-
-
 const PostController = {
   // [POST] /api/post
   async store(req, res) {
-
-    // console.log("hhh", req.body.name);
-    // res.status(200).json(req.body.name);
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-
-    console.log(req.body);
     try {
       const {
         imagePost,
