@@ -1,6 +1,7 @@
 const JWT = require("jsonwebtoken");
 
 const authentication = {
+    
   async verifyAccessToken(req, res, next) {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1]; // Bearer Token

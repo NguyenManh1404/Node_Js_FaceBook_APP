@@ -219,6 +219,146 @@ module.exports = mongoose.model("post", schema);
 
 ## Setup token 
 1. `yarn add jsonwebtoken`: Create đặt thư viện
+
+2. Tạo `ACCESS_TOKEN_SECRET` and `REFRESH_TOKEN_SECRET` trong env
+3. Cấu hình token ở hàm login để trả về token
+```js
+const User = require("../../models/User");
+const { validationResult } = require("express-validator");
+const bcrypt = require("bcrypt"); // thư viện để Hash password
+const JWT = require("jsonwebtoken"); // thư viện để create token
+
+const AuthController = {
+
+  // [POST] /api/auth/login
+
+  async login(req, res){
+    //validate
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const { email, password } = req.body;
+      const user = await User.findOne({ email: email });
+
+      // user not found
+      if (!user) {
+        return res.status(400).json({ errors: [{ msg: "User do not exist" }] });
+      }
+
+      // Compare hased password with user password to see if they are valid
+      const isMatch = await bcrypt.compareSync(password, user.password);
+
+      if (!isMatch) {
+        return res
+          .status(401)
+          .json({ errors: [{ msg: "Email or password is invalid" }] });
+      }
+
+      //Colet filed to add into token
+      const {_id, firstName, lastName } = user;
+
+
+      // Send JWT access token
+      const accessToken = await JWT.sign(
+        { id:_id, firstName, lastName },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "3h" }
+      );
+
+      // Refresh token
+      const refreshToken = await JWT.sign(
+        { id: _id, firstName, lastName },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+          expiresIn: "7d",
+        }
+      );
+      // response
+      return res.json({ user, accessToken, refreshToken });
+    } catch (error) {
+        console.error(error);
+        return res
+          .status(500)
+          .json({ errors: [{ msg: "Internal server error" }] });
+    }
+  }
+};
+
+module.exports = AuthController;
+
+```
+4. Tạo thư mục `app/middleware/authentication.js ` để `verify` token khi gọi api thong qua ` Bearer Token`
+```js
+const JWT = require("jsonwebtoken");
+
+const authentication = {
+    
+  async verifyAccessToken(req, res, next) {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1]; // Bearer Token
+
+    // If token not found, send error message
+    if (!token)
+      return res.status(401).json({ errors: [{ msg: "Token not found" }] });
+    // Authenticate token
+    try {
+      const user = await JWT.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      req.user = user;
+      next();
+    } catch (error) {
+      console.error(error.message);
+      if (error.name === "TokenExpiredError")
+        return res.status(200).json({ code: 401, msg: error.message });
+      return res
+        .status(403)
+        .json({ errors: [{ msg: "Internal server error" }] });
+    }
+  },
+
+  async verifyRefreshToken(req, res, next) {
+    const { refreshToken } = req.body;
+    // If token not found, send error message
+    if (!refreshToken)
+      return res
+        .status(401)
+        .json({ errors: [{ msg: "Refresh token not found" }] });
+    // Authenticate token
+    try {
+      const user = await JWT.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET
+      );
+      req.user = user;
+      next();
+    } catch (error) {
+      console.error(error.message);
+      return res.status(403).json({ errors: [{ msg: "Invalid token" }] });
+    }
+  },
+};
+
+module.exports = authentication;
+
+```
+5. Sử dụng ở router
+```js
+const express = require('express'); //import
+const router = express.Router(); //import
+const validator = require("../validation/posts"); //import validator
+const PostController = require("../app/controllers/PostController"); //import controller
+const { verifyAccessToken } = require("../app/middleware/authentication");
+
+//this is router
+router.post("/upload",verifyAccessToken, validator.post, PostController.store);
+
+
+module.exports = router;
+```
+
+6. Test lại thì dùng `Bearer Token `nha
 ## Setup cloudinary
 
 1. **yarn add cloudinary**: Create đặt thư viện
