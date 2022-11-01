@@ -359,6 +359,19 @@ module.exports = router;
 ```
 
 6. Test lại thì dùng `Bearer Token `nha
+
+
+## Deploy lên heroku.
+
+1. Lưu ý khi public lên thì phải sửa lại `PORT` cho đúng
+```js
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Our app is running on port ${ PORT }`);
+});
+```
+2. Sửa lại đia chỉ `IP Address` thành `0.0.0.0/0`
+
 ## Setup cloudinary
 
 1. **yarn add cloudinary**: Create đặt thư viện
