@@ -24,7 +24,7 @@ routes(app);
 
 
 
-app.listen(port, () => {
+app.listen(port || 3000, () => {
   console.log(`Example app listening on port http://localhost:${port}`)
 })
 
