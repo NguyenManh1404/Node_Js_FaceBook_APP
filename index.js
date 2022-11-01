@@ -6,7 +6,7 @@ const config = require("dotenv").config(); //thư viện để đọc từ ennv
 
 const bodyParser = require("body-parser"); //Lấy được dữ liệu nhập vào (như trong req.body)
 
-const port = config.parsed.PORT;
+const port = process.env.PORT;
 
 const app = express();
 //log request on terminal  
@@ -25,6 +25,6 @@ routes(app);
 
 
 app.listen(port || 3000, () => {
-  console.log(`Example app listening on port http://localhost:${port}`)
+  console.log(`Example app listening on port http://localhost:${port || 3000}`)
 })
 
