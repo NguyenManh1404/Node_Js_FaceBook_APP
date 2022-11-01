@@ -216,6 +216,9 @@ let schema = new mongoose.Schema(
 module.exports = mongoose.model("post", schema);
 ```
 
+
+## Setup token 
+1. `yarn add jsonwebtoken`: Create đặt thư viện
 ## Setup cloudinary
 
 1. **yarn add cloudinary**: Create đặt thư viện
