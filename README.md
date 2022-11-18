@@ -370,7 +370,7 @@ app.listen(PORT, () => {
     console.log(`Our app is running on port ${ PORT }`);
 });
 ```
-2. Sửa lại đia chỉ `IP Address` thành `0.0.0.0/0`
+2. Sửa lại đia chỉ `IP Address` thành `0.0.0.0/0` trên mongodb
 
 ## Setup cloudinary
 
