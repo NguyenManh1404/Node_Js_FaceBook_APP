@@ -375,5 +375,117 @@ app.listen(PORT, () => {
 ## Setup cloudinary
 
 1. **yarn add cloudinary**: Create đặt thư viện
-2. Thêm những key vào .env
-3. 
+2. **yarn add express-form-data** thư việ để passing data
+3. **yarn add os** : core module of node js
+4. Bỏ vào thư mục `index.js`, file server đó
+<details>
+
+  ```js
+  const bodyParser = require("body-parser"); //Lấy được dữ liệu nhập vào (như trong req.body)
+  const formData = require("express-form-data"); //TEST FORM DATA
+  const os = require("os"); //TEST FORM DATA
+
+
+  //parse request to body-parser
+  app.use(bodyParser.urlencoded({ limit: "50mb", extended: true })); // Parse URL-encoded bodies using qs library
+  app.use(bodyParser.json({ limit: "50mb" }));
+
+  //TEST FORM DATA
+  const options = {
+    uploadDir: os.tmpdir(),
+    autoClean: true,
+  };
+
+  // parse data with connect-multiparty.
+  app.use(formData.parse(options));
+  // delete from the request all empty files (size == 0)
+  app.use(formData.format());
+  // change the file objects to fs.ReadStream
+  app.use(formData.stream());
+  // union the body and the files
+  app.use(formData.union());
+  //TEST FORM DATA
+  ```
+  5. Tạo function upload image trong file `helper.js`
+  ```js
+  const cloudinary = require("../../config/cloudinary");
+
+  const uploadImage = async (imagePath) => {
+    // Use the uploaded file's name as the asset's public ID and
+    // allow overwriting the asset with new versions
+    const options = {
+      folder: "FacbookApp", // tên folder trên cloud
+      resource_type: "image", // chỉ là ảnh
+      use_filename: true,
+      unique_filename: false,
+      overwrite: true, // cho phép đè khi cùng một ảnh
+    };
+
+    try {
+      // Upload the image
+      const result = await cloudinary.uploader.upload(imagePath, options);
+      return result;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  module.exports = { uploadImage };
+  ```
+
+</details>
+
+
+6. Demo trong controller
+
+<details>
+
+```js
+const Post = require("../../models/Post");
+const { validationResult } = require("express-validator");
+const { uploadImage } = require("../../shared/helper");
+
+const PostController = {
+  // [POST] /api/post
+  async store(req, res) {
+    //validation
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    try {
+      const {
+        imagePost,
+        contentPost,
+        likePost,
+        lovePost,
+        commentsPost,
+        statusPost,
+      } = req.body;
+      //gọi hàm upload image bằng cloudinary
+      const urlImage = await uploadImage(imagePost?.path);
+
+      const newPost = new Post({
+        idUser: "62c39ca5adbd3436894b82e2",
+        imagePost: urlImage.url,
+        contentPost: contentPost,
+        likePost: likePost,
+        lovePost: lovePost,
+        commentsPost: commentsPost,
+        statusPost: statusPost,
+      });
+      await newPost.save();
+      return res
+        .status(200)
+        .json({ msg: "Post was created successfully", data: newPost });
+    } catch (error) {
+      return res
+        .status(res.error.http_code || 500)
+        .json({ errors: [{ msg: error || res.error.message }] });
+    }
+  },
+};
+
+module.exports = PostController;
+
+```
+</details>
