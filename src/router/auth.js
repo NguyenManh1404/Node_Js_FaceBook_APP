@@ -10,5 +10,6 @@ const validator = require("../validation/users");
 
 router.post("/register", validator.register, AuthController.register);
 router.post("/login", validator.login, AuthController.login);
+router.get("/getAuth", AuthController.getAuth);
 
 module.exports = router;
