@@ -77,7 +77,7 @@ const AuthController = {
 
   // [POST] /api/auth/login
 
-  async login(req, res){
+  async login(req, res) {
     //validate
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -103,12 +103,11 @@ const AuthController = {
       }
 
       //Colet filed to add into token
-      const {_id, firstName, lastName } = user;
-
+      const { _id, firstName, lastName } = user;
 
       // Send JWT access token
       const accessToken = await JWT.sign(
-        { id:_id, firstName, lastName },
+        { id: _id, firstName, lastName },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "3h" }
       );
@@ -124,12 +123,16 @@ const AuthController = {
 
       return res.json({ user, accessToken, refreshToken });
     } catch (error) {
-        console.error(error);
-        return res
-          .status(500)
-          .json({ errors: [{ msg: "Internal server error" }] });
+      console.error(error);
+      return res
+        .status(500)
+        .json({ errors: [{ msg: "Internal server error" }] });
     }
-  }
+  },
+
+  async getAuth(req, res) {
+    return res.json({ name: "Hug Manh", password: "i love you" });
+  },
 };
 
 module.exports = AuthController;
