@@ -377,3 +377,8 @@ app.listen(PORT, () => {
 1. **yarn add cloudinary**: Create đặt thư viện
 2. Thêm những key vào .env
 3. 
+
+## Publish 
+
+1. brew install --cask ngrok
+2. ngrok http 3001  

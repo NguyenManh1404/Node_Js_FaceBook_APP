@@ -19,6 +19,14 @@ let schema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    emailVerificationCode: {
+      type: String,
+      default: null,
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
     phoneNumber: {
       type: String,
       trim: true,
