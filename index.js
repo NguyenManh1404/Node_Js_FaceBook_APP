@@ -84,7 +84,20 @@ const uploadMiddleware = multer({
           },
         },
       }
-    }, User, Category, Recipe],
+    }, {
+      resource: User,
+      options: {
+        toolbar: DefaultQuillToolbarOptions,
+        properties: {
+          avatar: {
+            components: {
+              list: AdminBro.bundle('./component/UserImage'),
+              show: AdminBro.bundle('./component/UserImage'),
+            },
+          },
+        },
+      }
+    }, Category, Recipe],
   })
 
   const router = AdminBroExpress.buildRouter(adminBro)
