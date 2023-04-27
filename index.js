@@ -13,11 +13,8 @@ const path = require("path");
 const app = express();
 const multer = require("multer");
 const clearImage = require("./src/utils/fileUtil");
-const Post = require("./src/models/Post");
-const User = require("./src/models/User");
-const Category = require("./src/models/Category");
-const Recipe = require("./src/models/Recipe");
-const { DefaultQuillToolbarOptions } = require("@admin-bro/design-system");
+const { resources } = require("./admin");
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, "/public"));
@@ -71,33 +68,7 @@ const uploadMiddleware = multer({
   AdminBro.registerAdapter({ Resource: AdminBroMongoose.Resource, Database: AdminBroMongoose.Database })
   const adminBro = new AdminBro({
     rootPath: '/admin',
-    resources: [{
-      resource: Post,
-      options: {
-        toolbar: DefaultQuillToolbarOptions,
-        properties: {
-          imagePost: {
-            components: {
-              list: AdminBro.bundle('./component/PostImage'),
-              show: AdminBro.bundle('./component/PostImage'),
-            },
-          },
-        },
-      }
-    }, {
-      resource: User,
-      options: {
-        toolbar: DefaultQuillToolbarOptions,
-        properties: {
-          avatar: {
-            components: {
-              list: AdminBro.bundle('./component/UserImage'),
-              show: AdminBro.bundle('./component/UserImage'),
-            },
-          },
-        },
-      }
-    }, Category, Recipe],
+    resources: resources,
   })
 
   const router = AdminBroExpress.buildRouter(adminBro)
