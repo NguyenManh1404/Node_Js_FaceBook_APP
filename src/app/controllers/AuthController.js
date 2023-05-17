@@ -143,6 +143,29 @@ const AuthController = {
     }
   },
 
+
+  async checkUserMatch(email, password) {
+    try {
+      const user = await User.findOne({ email: email });
+
+      // user not found
+      if (!user) {
+        return res
+          .status(400)
+          .json({ errors: [{ message: "User do not exist" }] });
+      }
+
+      // Compare hased password with user password to see if they are valid
+      const isMatch = await bcrypt.compareSync(password, user.password);
+
+      if (!isMatch) {
+        return user
+      }
+    } catch (error) {
+      return null
+    }
+  },
+
   // [POST] /api/auth/login
   async login(req, res) {
     //validate
@@ -198,15 +221,15 @@ const AuthController = {
     }
   },
 
-//   async loginFacebook(req, res) {
-// try {
-//    const { email, password } = req.body;
-  
-// } catch (error) {
-  
-// }
-// },
-     
+  //   async loginFacebook(req, res) {
+  // try {
+  //    const { email, password } = req.body;
+
+  // } catch (error) {
+
+  // }
+  // },
+
 
   async getAuth(req, res) {
     // passport.authenticate('EAAHdkS0ZBDKEBAMvbpMLIAuRfefTge5PdHVZChAh5GNZAwLEcoETnOfD7smJERePZANWHNwJznqoB6RBqsD9cM69cbe5lIzJIPAe8Q8EAEfrAQTArZB3TpNHYrAocx2gOaoge30IV9XHUirToh5uEqeTZBWgedGdTJks3pyBPzHkuhLdGwYC9fEqNPf3VLgKsXWJsZCdZCLkF2YBwU5N7zQlhCPnZCh52xseYZCMtu4cEL0eltkuPn0lta', (error, user, info) => {

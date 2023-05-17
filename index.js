@@ -13,7 +13,10 @@ const path = require("path");
 const app = express();
 const multer = require("multer");
 const clearImage = require("./src/utils/fileUtil");
-const { resources } = require("./admin");
+const { resources, pages, dashboard } = require("./admin");
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+const AuthController = require("./src/app/controllers/AuthController");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -69,7 +72,21 @@ const uploadMiddleware = multer({
   const adminBro = new AdminBro({
     rootPath: '/admin',
     resources: resources,
+    dashboard,
+    pages,
+    branding: {
+      companyName: 'Amazing c.o.',
+    }
   })
+
+
+  app.use(adminBro.options.rootPath, AdminBroExpress.buildAuthenticatedRouter(adminBro, {
+    authenticate: AuthController.checkUserMatch,
+    cookiePassword: process.env.COOKIE_SEC,
+  }));
+
+  app.use('/api-docs', swaggerUi.serve);
+  app.get('/api-docs', swaggerUi.setup(swaggerDocument));
 
   const router = AdminBroExpress.buildRouter(adminBro)
   app.use(adminBro.options.rootPath, router)

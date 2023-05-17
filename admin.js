@@ -25,6 +25,10 @@ const resources = [
             show: AdminBro.bundle('./component/UserImage'),
           },
         },
+        fullName: {
+          name: "Full name",
+          type: "String"
+        },
       },
     }
   },
@@ -45,4 +49,19 @@ const resources = [
     }
   }, Category, Recipe]
 
-module.exports = { resources }
+const pages =
+{
+  "Quản lý": {
+    handler: async (request, response, context) => {
+      return {
+        text: 'I am fetched from the backend',
+      }
+    },
+    component: AdminBro.bundle('./component/Custom'),
+  },
+}
+
+const dashboard = {
+  component: AdminBro.bundle('./component/Custom'),
+}
+module.exports = { resources, pages, dashboard }
