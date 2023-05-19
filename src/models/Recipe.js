@@ -24,7 +24,13 @@ let schema = new mongoose.Schema(
       name: { type: String },
       value: { type: String },
     },
-    steps: { type: String },
+    steps: [
+      {
+        type: String,
+        default: [],
+        required: true,
+      },
+    ], 
     author: {
       type: Schema.Types.ObjectId,
       ref: "user",
