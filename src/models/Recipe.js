@@ -13,8 +13,8 @@ let schema = new mongoose.Schema(
     ],
     categories: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "category",
+        type: String,
+        default: [],
         required: true,
       },
     ],
@@ -24,13 +24,10 @@ let schema = new mongoose.Schema(
       name: { type: String },
       value: { type: String },
     },
-    steps: [
-      {
-        type: String,
-        default: [],
-        required: true,
-      },
-    ], 
+    steps: {
+      number: { type: Number },
+      content: { type: String },
+    },
     author: {
       type: Schema.Types.ObjectId,
       ref: "user",
