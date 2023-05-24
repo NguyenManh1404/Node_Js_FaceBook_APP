@@ -2,6 +2,8 @@ const User = require("../../models/User");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt"); // thư viện để Hash password
 const JWT = require("jsonwebtoken"); // thư viện để create token
+const transporter = require("../../../config/nodemailler");
+const passport = require("passport");
 
 const AuthController = {
   // [POST] /api/auth/register
@@ -30,14 +32,14 @@ const AuthController = {
       const user = await User.findOne({ email: email });
       if (user) {
         return res.status(409).json({
-          errors: [{ email: user.email, msg: "The user already exist" }],
+          errors: [{ email: user.email, message: "The user already exist" }],
         });
       }
 
       //Check password with confirmPassword
       if (password !== confirmPassword) {
         return res.status(401).json({
-          errors: [{ msg: "Confirm password not match" }],
+          errors: [{ message: "Confirm password not match" }],
         });
       }
 
@@ -45,11 +47,19 @@ const AuthController = {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
+      //Generate 6 code
+      const generateVerificationCode = () => {
+        const code = Math.floor(Math.random() * 900000) + 100000;
+        return code.toString();
+      };
+      const emailVerificationCode = generateVerificationCode();
+
       // Date user
       const data = {
         firstName,
         lastName,
         email,
+        emailVerificationCode,
         phoneNumber,
         avatar,
         position,
@@ -63,20 +73,100 @@ const AuthController = {
       await newUser.save();
       // const secret = process.env.ACCESS_TOKEN_SECRET
       // const token = JWT.sign({ email }, secret, { expiresIn: "10m" });
+
+      const mailOptions = {
+        from: "MasterMeal Team",
+        to: email,
+        subject: "MasterMeal - Verify email",
+        template: "verify-email",
+        context: {
+          firstName: firstName,
+          emailVerificationCode,
+        },
+      };
+
+      await transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.error(error.message);
+          return res
+            .status(500)
+            .json({ errors: [{ message: "Internal server error" }] });
+        } else {
+          return res.json({
+            message: `We have sent a verify email link to ${email}`,
+          });
+        }
+      });
       //res
       return res
         .status(200)
-        .json({ msg: "Registered an account successfully" });
+        .json({ data: newUser, message: "Registered an account successfully" });
     } catch (error) {
       console.error(error.message);
       return res
         .status(500)
-        .json({ errors: [{ msg: "Internal server error", error }] });
+        .json({ errors: [{ message: "Internal server error", error }] });
+    }
+  },
+  // [POST] /api/auth/verify
+  async verifyEmail(req, res) {
+    //validate
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      const { email, emailVerificationCode } = req?.body;
+
+      const user = await User.findOne({
+        email: email,
+        emailVerificationCode: emailVerificationCode,
+      });
+
+      if (user) {
+        await User.findByIdAndUpdate(user.id, {
+          isEmailVerified: true,
+        });
+
+        return res
+          .status(200)
+          .json({ data: user, message: "Verify account successfully" });
+      } else {
+        return res
+          .status(200)
+          .json({ message: "Mail verification code or Email is not match" });
+      }
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ errors: [{ message: "Internal server error", error }] });
+    }
+  },
+
+
+  async checkUserMatch(email, password) {
+    try {
+      const user = await User.findOne({ email: email });
+
+      // user not found
+      if (!user) {
+        return res
+          .status(400)
+          .json({ errors: [{ message: "User do not exist" }] });
+      }
+
+      // Compare hased password with user password to see if they are valid
+      const isMatch = await bcrypt.compareSync(password, user.password);
+
+      if (!isMatch) {
+        return user
+      }
+    } catch (error) {
+      return null
     }
   },
 
   // [POST] /api/auth/login
-
   async login(req, res) {
     //validate
     const errors = validationResult(req);
@@ -90,7 +180,9 @@ const AuthController = {
 
       // user not found
       if (!user) {
-        return res.status(400).json({ errors: [{ msg: "User do not exist" }] });
+        return res
+          .status(400)
+          .json({ errors: [{ message: "User do not exist" }] });
       }
 
       // Compare hased password with user password to see if they are valid
@@ -99,7 +191,7 @@ const AuthController = {
       if (!isMatch) {
         return res
           .status(401)
-          .json({ errors: [{ msg: "Email or password is invalid" }] });
+          .json({ errors: [{ message: "Email or password is invalid" }] });
       }
 
       //Colet filed to add into token
@@ -123,13 +215,55 @@ const AuthController = {
 
       return res.json({ user, accessToken, refreshToken });
     } catch (error) {
-      console.error(error);
       return res
         .status(500)
-        .json({ errors: [{ msg: "Internal server error" }] });
+        .json({ errors: [{ message: "Internal server error" }] });
     }
   },
+
+  //   async loginFacebook(req, res) {
+  // try {
+  //    const { email, password } = req.body;
+
+  // } catch (error) {
+
+  // }
+  // },
+
+
   async getAuth(req, res) {
+    // passport.authenticate('EAAHdkS0ZBDKEBAMvbpMLIAuRfefTge5PdHVZChAh5GNZAwLEcoETnOfD7smJERePZANWHNwJznqoB6RBqsD9cM69cbe5lIzJIPAe8Q8EAEfrAQTArZB3TpNHYrAocx2gOaoge30IV9XHUirToh5uEqeTZBWgedGdTJks3pyBPzHkuhLdGwYC9fEqNPf3VLgKsXWJsZCdZCLkF2YBwU5N7zQlhCPnZCh52xseYZCMtu4cEL0eltkuPn0lta', (error, user, info) => {
+    //   console.log("🚀 ~ file: AuthController.js:207 ~ passport.authenticate ~ user:", user)
+    //   if (error) {
+    //     resolve(error);
+    //   }
+
+    //   resolve(user);
+    // })(request);
+
+    // const mailOptions = {
+    //   from: "MasterMeal Team",
+    //   to: "tuongmynga@gmail.com",
+    //   subject: "MasterMeal - Verify email",
+    //   template: "verify-email",
+    //   context: {
+    //     firstName: "Manh Nguyen",
+    //   },
+    // };
+
+    // await transporter.sendMail(mailOptions, function (error, info) {
+    //   if (error) {
+    //     console.error(error.message);
+    //     return res
+    //       .status(500)
+    //       .json({ errors: [{ message: "Internal server error" }] });
+    //   } else {
+    //     return res.json({
+    //       message: `We have sent a verify email link to ${email}`,
+    //     });
+    //   }
+    // });
+
     return res.json({ name: "Hug Manh", password: "i love you" });
   },
 };

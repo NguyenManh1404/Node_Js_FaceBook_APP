@@ -33,6 +33,18 @@ const login = [
   check("password", "Password is required").notEmpty(),
 ];
 
+const verifyEmail = [
+  check(
+    "emailVerificationCode",
+    "Email VerificationCode is required"
+  ).notEmpty(),
+  check(
+    "emailVerificationCode",
+    "emailVerificationCode must be at least 6 characters"
+  ).isLength({
+    min: 6,
+  }),
+];
 
 //{
 //     "firstName": "firstName",
@@ -44,6 +56,6 @@ const login = [
 
 // }
 
-const validator = { register, login };
+const validator = { register, login, verifyEmail };
 
 module.exports = validator;

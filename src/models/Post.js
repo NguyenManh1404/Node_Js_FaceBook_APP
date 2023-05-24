@@ -6,6 +6,10 @@ let schema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       required: true,
     },
+    title: {
+      type: String,
+      required: true,
+    },
     imagePost: {
       type: String,
       required: true,
