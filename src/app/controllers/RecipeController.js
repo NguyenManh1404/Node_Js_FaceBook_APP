@@ -1,5 +1,6 @@
 const Recipe = require("../../models/Recipe");
 const User = require("../../models/User");
+const Favorite = require("../../models/Favorite");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const RecipeController = {
@@ -14,7 +15,6 @@ const RecipeController = {
         linkVideo,
         images,
         categories,
-        serves,
         cookTime,
         ingredients,
         steps,
@@ -28,7 +28,6 @@ const RecipeController = {
         linkVideo: linkVideo,
         images: images,
         categories: categories,
-        serves: serves,
         cookTime: cookTime,
         ingredients: ingredients,
         steps: steps,
@@ -140,8 +139,12 @@ const RecipeController = {
       const token = authHeader.split(" ")[1];
       const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       console.log(decodedToken);
+      const userId = decodedToken.id;
 
-      const recipes = await Recipe.find().sort({ updatedAt: -1 }).limit(10); // Thêm phương thức .limit(10) để giới hạn kết quả trả về là 10
+      const recipes = await Recipe.find()
+        .sort({ updatedAt: -1 })
+        .limit(10);
+        // Sử dụng .lean() để chuyển đổi kết quả từ Object Mongoose thành JavaScript object; // Thêm phương thức .limit(10) để giới hạn kết quả trả về là 10
 
       // Lấy danh sách userId của người tạo trong các công thức
       const userIds = recipes.map((recipe) => recipe.author);
@@ -155,23 +158,34 @@ const RecipeController = {
         creatorMap[creator._id] = creator.firstName;
       });
 
-      // Gắn tên người tạo vào mỗi công thức
-      const recipesWithCreator = recipes.map((recipe) => ({
-        ...recipe._doc,
-        creatorName: creatorMap[recipe.author],
-      }));
+    const favorites = await Favorite.find({ userId });
+
+      const favoriteRecipeIds = favorites.map((favorite) =>
+        favorite.recipeId.toString()
+      );
+      const recipesWithCreatorAndFavorite = recipes.map((recipe) => {
+        const isFavorite = favoriteRecipeIds.includes(recipe._id.toString());
+        return {
+          ...recipe._doc,
+          creatorName: creatorMap[recipe.author],
+          isFavorite,
+        };
+      });
+
       // Get ra list
-      res
-        .status(200)
-        .json({
-          msg: "Get list recipe successfully",
-          recipes: recipesWithCreator,
-        });
+      res.status(200).json({
+        msg: "Get list recipe successfully",
+        recipes: recipesWithCreatorAndFavorite,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ errors: [{ msg: error }] });
     }
   },
+
+  //[POST]
+
+
 };
 
 module.exports = RecipeController;

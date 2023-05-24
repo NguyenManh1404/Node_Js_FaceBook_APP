@@ -18,16 +18,14 @@ let schema = new mongoose.Schema(
         required: true,
       },
     ],
-    serves: { type: Number, min: 0 },
     cookTime: { type: Number, min: 0 },
-    ingredients: {
-      name: { type: String },
-      value: { type: String },
-    },
-    steps: {
-      number: { type: Number },
-      content: { type: String },
-    },
+    ingredients: [
+      {
+        name: { type: String },
+        value: { type: String },
+      },
+    ],
+    steps: [{ number: { type: Number }, content: { type: String } }],
     author: {
       type: Schema.Types.ObjectId,
       ref: "user",
