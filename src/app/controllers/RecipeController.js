@@ -51,10 +51,20 @@ const RecipeController = {
       const token = authHeader.split(" ")[1];
       const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       console.log(decodedToken);
+      const userId = decodedToken.id;
 
       const recipes = await Recipe.find({ categories: "1" }).sort({
         updatedAt: -1,
-      });
+      }).lean();
+
+      // Loop through each recipe and check if it is a favorite for the user
+      for (const recipe of recipes) {
+        const isFavorite = await Favorite.exists({
+          userId: userId,
+          recipeId: recipe._id,
+        });
+      recipe.isFavorite = isFavorite ? true : false;
+      }
 
       res.status(200).json({ msg: "Get list recipe successfully", recipes });
     } catch (error) {
@@ -73,10 +83,21 @@ const RecipeController = {
       const token = authHeader.split(" ")[1];
       const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       console.log(decodedToken);
+      const userId = decodedToken.id;
+      const recipes = await Recipe.find({ categories: "2" })
+        .sort({
+          updatedAt: -1,
+        })
+        .lean();
 
-      const recipes = await Recipe.find({ categories: "2" }).sort({
-        updatedAt: -1,
-      });
+      // Loop through each recipe and check if it is a favorite for the user
+      for (const recipe of recipes) {
+        const isFavorite = await Favorite.exists({
+          userId: userId,
+          recipeId: recipe._id,
+        });
+        recipe.isFavorite = isFavorite ? true : false;
+      }
 
       res.status(200).json({ msg: "Get list recipe successfully", recipes });
     } catch (error) {
@@ -95,10 +116,21 @@ const RecipeController = {
       const token = authHeader.split(" ")[1];
       const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       console.log(decodedToken);
+      const userId = decodedToken.id;
+      const recipes = await Recipe.find({ categories: "3" })
+        .sort({
+          updatedAt: -1,
+        })
+        .lean();
 
-      const recipes = await Recipe.find({ categories: "3" }).sort({
-        updatedAt: -1,
-      });
+      // Loop through each recipe and check if it is a favorite for the user
+      for (const recipe of recipes) {
+        const isFavorite = await Favorite.exists({
+          userId: userId,
+          recipeId: recipe._id,
+        });
+        recipe.isFavorite = isFavorite ? true : false;
+      }
 
       res.status(200).json({ msg: "Get list recipe successfully", recipes });
     } catch (error) {
@@ -117,10 +149,21 @@ const RecipeController = {
       const token = authHeader.split(" ")[1];
       const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       console.log(decodedToken);
+      const userId = decodedToken.id;
+      const recipes = await Recipe.find({ categories: "4" })
+        .sort({
+          updatedAt: -1,
+        })
+        .lean();
 
-      const recipes = await Recipe.find({ categories: "4" }).sort({
-        updatedAt: -1,
-      });
+      // Loop through each recipe and check if it is a favorite for the user
+      for (const recipe of recipes) {
+        const isFavorite = await Favorite.exists({
+          userId: userId,
+          recipeId: recipe._id,
+        });
+        recipe.isFavorite = isFavorite ? true : false;
+      }
 
       res.status(200).json({ msg: "Get list recipe successfully", recipes });
     } catch (error) {
