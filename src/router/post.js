@@ -4,9 +4,10 @@ const validator = require("../validation/posts"); //import validator
 const PostController = require("../app/controllers/PostController"); //import controller
 const { verifyAccessToken } = require("../app/middleware/authentication");
 
-router.get("/", verifyAccessToken, PostController.list);
+router.get("/", PostController.list);
 router.get("/:id", verifyAccessToken, PostController.detail);
 router.post("/upload", verifyAccessToken, validator.post, PostController.store);
+router.get("/get-post-current-user/:id", verifyAccessToken, PostController.getPostCurrentUser);
 
 
 module.exports = router;
