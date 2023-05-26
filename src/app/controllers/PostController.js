@@ -30,8 +30,9 @@ const PostController = {
         $regex: '.*' + req.query.contentPost + '.*'
       }
     }
+    options.statusPost = true;
     try {
-      const data = await Post.find(options).sort({ createdAt: 'descending' })
+      const data = await Post.find(options).sort({ lovePost: 'descending' })
       res.status(200).json({ msg: 'get post list success', data });
 
     } catch (error) {
