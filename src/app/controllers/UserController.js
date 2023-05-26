@@ -5,9 +5,29 @@ const UserController = {
   async list(req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    
+    const options = {}
+    if(req.query.firstName) {
+      options.firstName = {
+        $regex: '.*' + req.query.firstName + '.*'
+      }
+    }
+
+    if(req.query.lastName) {
+      options.lastName = {
+        $regex: '.*' + req.query.lastName + '.*'
+      }
+    }
+
+    if(req.query.email) {
+      options.email = {
+        $regex: '.*' + req.query.email + '.*'
+      }
+    }
+
     try {
 
-      const data = await User.find({}).sort({ createdAt: 'descending' })
+      const data = await User.find(options).sort({ createdAt: 'descending' })
       res.status(200).json({ msg: 'get user list success', data });
 
     } catch (error) {
