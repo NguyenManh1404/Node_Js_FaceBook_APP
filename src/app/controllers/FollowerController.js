@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const Follower = require("../../models/Follower");
+const NotificationController = require("../controllers/NotificationController");
 const User = require("../../models/User");
 
 const FollowerController = {
@@ -53,6 +54,7 @@ const FollowerController = {
         idUserFollower: idUserFollower
       });
       await newFollower.save();
+      NotificationController.getNotification();
       res. status(200).json({ msg: "Follower was created successfully" });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
