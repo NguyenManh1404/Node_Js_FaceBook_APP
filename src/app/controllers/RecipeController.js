@@ -237,63 +237,73 @@ const RecipeController = {
      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
      console.log(decodedToken);
      const userId = decodedToken.id;
-     const topRecipes = await Favorite.aggregate([
-       { $group: { _id: "$recipeId", count: { $sum: 1 } } },
-       { $sort: { count: -1 } },
-       { $limit: 10 },
-       {
-         $lookup: {
-           from: "recipes",
-           localField: "_id",
-           foreignField: "_id",
-           as: "recipe",
-         },
-       },
-       { $unwind: "$recipe" },
-       {
-         $lookup: {
-           from: "favorites",
-           let: { recipeId: "$recipe._id", userId: userId },
-           pipeline: [
-             {
-               $match: {
-                 $expr: {
-                   $and: [
-                     { $eq: ["$recipeId", "$$recipeId"] },
-                     { $eq: ["$userId", "$$userId"] },
-                   ],
-                 },
-               },
-             },
-             { $limit: 1 },
-           ],
-           as: "favorite",
-         },
-       },
-       {
-         $addFields: {
-           isFavorited: {
-             $cond: { if: { $size: "$favorite" }, then: true, else: false },
-           },
-         },
-       },
-       {
-         $project: {
-           "recipe._id": 0,
-           "recipe.createdAt": 0,
-           "recipe.updatedAt": 0,
-           favorite: 0,
-         },
-       },
-     ]);
+    const topRecipes = await Favorite.aggregate([
+      { $group: { _id: "$recipeId", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: "recipes",
+          localField: "_id",
+          foreignField: "_id",
+          as: "recipe",
+        },
+      },
+      { $unwind: "$recipe" },
+      {
+        $lookup: {
+          from: "favorites",
+          let: { recipeId: "$recipe._id", userId: userId },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$recipeId", "$$recipeId"] },
+                    { $eq: ["$userId", "$$userId"] },
+                  ],
+                },
+              },
+            },
+            { $limit: 1 },
+          ],
+          as: "favorite",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "recipe.author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      {
+        $addFields: {
+          isFavorited: {
+            $cond: { if: { $size: "$favorite" }, then: true, else: false },
+          },
+          authorId: { $arrayElemAt: ["$author._id", 0] },
+          authorFirstName: { $arrayElemAt: ["$author.firstName", 0] },
+          authorAvatar: { $arrayElemAt: ["$author.avatar", 0] },
+        },
+      },
+      {
+        $project: {
+          "recipe._id": 0,
+          "recipe.createdAt": 0,
+          "recipe.updatedAt": 0,
+          favorite: 0,
+          author: 0,
+        },
+      },
+    ]);
 
      res.status(200).json({ msg: "get post list success", topRecipes });
    } catch (error) {
      return res.status(500).json({ errors: [{ msg: error }] });
    }
   },
-
-  //Muốn get 10 cái recipe có lượng yêu thích nhiều nhất
 };
 
 module.exports = RecipeController;
