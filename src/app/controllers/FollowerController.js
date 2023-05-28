@@ -54,7 +54,7 @@ const FollowerController = {
         idUserFollower: idUserFollower
       });
       await newFollower.save();
-      NotificationController.getNotification();
+      NotificationController.getNotificationFollower(req);
       res. status(200).json({ msg: "Follower was created successfully" });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
