@@ -40,6 +40,51 @@ const NotificationController = {
 
     return res.json({ name: "Hug Manh", password: "get notify" });
   },
+
+  async getNotificationFollower(req, res) {
+
+    const follower = {
+      title: "You are new follow",
+      name: req.body.name,
+      name_follower: req.body.name_follower
+    }
+
+    const message = {
+      notification: {
+        title: "Chuc Nga ngu Ngon",
+        body: follower,
+        imageUrl: "https://foo.bar.pizza-monster.png",
+      },
+      android: {
+        notification: {
+          sound: "default",
+          imageUrl: "https://foo.bar.pizza-monster.png",
+        },
+      },
+      webpush: {
+        headers: {
+          image: "https://foo.bar.pizza-monster.png",
+        },
+      },
+      token:
+        req.body.token,
+    };
+ 
+    admin
+      .messaging()
+      .send(message)
+      .then((response) => {
+        console.log("Message sent successfully:", response);
+      })
+      .catch((error) => {
+        console.log("Error sending message:", error);
+      });
+ 
+     return res.json({ name: "Hug Manh", password: "get notify" });
+   },
+
+  
+
 };
 
 module.exports = NotificationController;
