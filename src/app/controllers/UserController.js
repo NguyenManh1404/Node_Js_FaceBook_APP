@@ -1,13 +1,16 @@
 const User = require("../../models/User");
 const { validationResult } = require("express-validator");
+
 const UserController = {
   // [GET] /api/user
   async list(req, res) {
     const errors = validationResult(req);
+
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
 
     const options = {};
+
     if (req.query.firstName) {
       options.firstName = {
         $regex: ".*" + req.query.firstName + ".*",
@@ -81,6 +84,20 @@ const UserController = {
       res.status(200).json({ msg: "get user", data });
     } else {
       res.status(200).json({ msg: "user not found" });
+    }
+  },
+
+  // Upload endpoint
+  upload(req, res) {
+    if (req.file) {
+      try {
+        const filePath = req.file.path;
+        res.json({ filePath });
+      } catch (error) {
+        res.status(500).json({ error: error?.message });
+      }
+    } else {
+      res.status(400).json({ error: "No file uploaded" });
     }
   },
 };

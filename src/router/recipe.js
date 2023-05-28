@@ -9,5 +9,6 @@ router.get("/lunch", verifyAccessToken, RecipeController.getLunch);
 router.get("/diner", verifyAccessToken, RecipeController.getDiner);
 router.get("/diet", verifyAccessToken, RecipeController.getDiet);
 router.get("/recent", verifyAccessToken, RecipeController.getRecentRecipe);
+router.get("/trending", verifyAccessToken, RecipeController.trendingNow);
 
 module.exports = router;
