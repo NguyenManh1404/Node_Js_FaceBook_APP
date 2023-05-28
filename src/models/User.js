@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { USER_ROLE } = require('../utils/constant');
 
 let schema = new mongoose.Schema(
   {
@@ -62,6 +63,12 @@ let schema = new mongoose.Schema(
       type: Boolean,
       required: true,
       default: false,
+    },
+    role: {
+      type: String,
+      required: true,
+      default: USER_ROLE.USER_ROLE,
+      enum: Object.values(USER_ROLE)
     },
   },
   {

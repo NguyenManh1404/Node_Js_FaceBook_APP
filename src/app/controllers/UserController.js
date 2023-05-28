@@ -1,25 +1,28 @@
 const User = require("../../models/User");
 const { validationResult } = require("express-validator");
+
+
+
 const UserController = {
   // [GET] /api/user
   async list(req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-    
+
     const options = {}
-    if(req.query.firstName) {
+    if (req.query.firstName) {
       options.firstName = {
         $regex: '.*' + req.query.firstName + '.*'
       }
     }
 
-    if(req.query.lastName) {
+    if (req.query.lastName) {
       options.lastName = {
         $regex: '.*' + req.query.lastName + '.*'
       }
     }
 
-    if(req.query.email) {
+    if (req.query.email) {
       options.email = {
         $regex: '.*' + req.query.email + '.*'
       }
@@ -69,6 +72,21 @@ const UserController = {
       return res.status(500).json({ errors: [{ msg: error }] });
     }
   },
+
+
+  // Upload endpoint
+  upload(req, res) {
+    if (req.file) {
+      try {
+        const filePath = req.file.path;
+        res.json({ filePath });
+      } catch (error) {
+        res.status(500).json({ error: error?.message });
+      }
+    } else {
+      res.status(400).json({ error: 'No file uploaded' });
+    }
+  }
 };
 
 module.exports = UserController;
