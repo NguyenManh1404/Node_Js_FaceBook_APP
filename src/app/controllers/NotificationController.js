@@ -9,8 +9,8 @@ const NotificationController = {
 
    const message = {
      notification: {
-       title: "Chuc Nga ngu Ngon",
-       body: "Mot di sinh nhat manh nha!",
+       title: "Dẹmo",
+       body: "Body demo",
        imageUrl: "https://foo.bar.pizza-monster.png",
      },
      android: {
