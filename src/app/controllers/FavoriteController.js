@@ -165,6 +165,10 @@ const FavoriteController = {
       return res.status(500).json({ errors: [{ msg: error }] });
     }
   },
+
+  
+
+
 };
 
 module.exports = FavoriteController;

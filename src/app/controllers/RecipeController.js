@@ -53,9 +53,11 @@ const RecipeController = {
       console.log(decodedToken);
       const userId = decodedToken.id;
 
-      const recipes = await Recipe.find({ categories: "1" }).sort({
-        updatedAt: -1,
-      }).lean();
+      const recipes = await Recipe.find({ categories: "1" })
+        .sort({
+          updatedAt: -1,
+        })
+        .lean();
 
       // Loop through each recipe and check if it is a favorite for the user
       for (const recipe of recipes) {
@@ -63,7 +65,7 @@ const RecipeController = {
           userId: userId,
           recipeId: recipe._id,
         });
-      recipe.isFavorite = isFavorite ? true : false;
+        recipe.isFavorite = isFavorite ? true : false;
       }
 
       res.status(200).json({ msg: "Get list recipe successfully", recipes });
@@ -184,10 +186,8 @@ const RecipeController = {
       console.log(decodedToken);
       const userId = decodedToken.id;
 
-      const recipes = await Recipe.find()
-        .sort({ updatedAt: -1 })
-        .limit(10);
-        // Sử dụng .lean() để chuyển đổi kết quả từ Object Mongoose thành JavaScript object; // Thêm phương thức .limit(10) để giới hạn kết quả trả về là 10
+      const recipes = await Recipe.find().sort({ updatedAt: -1 }).limit(10);
+      // Sử dụng .lean() để chuyển đổi kết quả từ Object Mongoose thành JavaScript object; // Thêm phương thức .limit(10) để giới hạn kết quả trả về là 10
 
       // Lấy danh sách userId của người tạo trong các công thức
       const userIds = recipes.map((recipe) => recipe.author);
@@ -201,7 +201,7 @@ const RecipeController = {
         creatorMap[creator._id] = creator.firstName;
       });
 
-    const favorites = await Favorite.find({ userId });
+      const favorites = await Favorite.find({ userId });
 
       const favoriteRecipeIds = favorites.map((favorite) =>
         favorite.recipeId.toString()
@@ -226,9 +226,74 @@ const RecipeController = {
     }
   },
 
-  //[POST]
+  //[GET] /api/recipe/trending
+  async trendingNow(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+   try {
+     const authHeader = req.get("Authorization");
+     const token = authHeader.split(" ")[1];
+     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+     console.log(decodedToken);
+     const userId = decodedToken.id;
+     const topRecipes = await Favorite.aggregate([
+       { $group: { _id: "$recipeId", count: { $sum: 1 } } },
+       { $sort: { count: -1 } },
+       { $limit: 10 },
+       {
+         $lookup: {
+           from: "recipes",
+           localField: "_id",
+           foreignField: "_id",
+           as: "recipe",
+         },
+       },
+       { $unwind: "$recipe" },
+       {
+         $lookup: {
+           from: "favorites",
+           let: { recipeId: "$recipe._id", userId: userId },
+           pipeline: [
+             {
+               $match: {
+                 $expr: {
+                   $and: [
+                     { $eq: ["$recipeId", "$$recipeId"] },
+                     { $eq: ["$userId", "$$userId"] },
+                   ],
+                 },
+               },
+             },
+             { $limit: 1 },
+           ],
+           as: "favorite",
+         },
+       },
+       {
+         $addFields: {
+           isFavorited: {
+             $cond: { if: { $size: "$favorite" }, then: true, else: false },
+           },
+         },
+       },
+       {
+         $project: {
+           "recipe._id": 0,
+           "recipe.createdAt": 0,
+           "recipe.updatedAt": 0,
+           favorite: 0,
+         },
+       },
+     ]);
 
+     res.status(200).json({ msg: "get post list success", topRecipes });
+   } catch (error) {
+     return res.status(500).json({ errors: [{ msg: error }] });
+   }
+  },
 
+  //Muốn get 10 cái recipe có lượng yêu thích nhiều nhất
 };
 
 module.exports = RecipeController;
