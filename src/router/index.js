@@ -9,7 +9,6 @@ const favoriteRouter = require("./favorite");
 const followerRouter = require('./follower')
 const commentRouter = require('./comment')
 
-const UserController = require("../app/controllers/UserController");
 const routes = (app) => {
   app.use("/api/auth", authRouter);
   app.use("/api/auth-admin", authAdminRouter);
