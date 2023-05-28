@@ -1,4 +1,5 @@
 const User = require("../../models/User");
+const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 
 const UserController = {
@@ -72,14 +73,14 @@ const UserController = {
 
   async getProfile(req, res) {
     const authHeader = req.get("Authorization");
+
     const token = authHeader.split(" ")[1];
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     const data = await User.find({
-      id: decodedToken.id,
+      _id: decodedToken.id,
     });
 
-    console.log(data);
     if (data) {
       res.status(200).json({ msg: "get user", data });
     } else {
