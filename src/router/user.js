@@ -7,6 +7,7 @@ const { uploadConfig } = require("../../config/upload");
 router.get("/", verifyAccessToken, UserController.list);
 
 router.get("/profile", verifyAccessToken, UserController.getProfile);
+router.get("/:id", verifyAccessToken, UserController.getDetailUser)
 
 router.get(
   "/popular-creator",
