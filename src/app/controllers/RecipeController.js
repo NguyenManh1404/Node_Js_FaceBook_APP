@@ -304,6 +304,99 @@ const RecipeController = {
      return res.status(500).json({ errors: [{ msg: error }] });
    }
   },
+
+  async edit(req, res) {
+    const authHeader = req.get("Authorization");
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const isUser = decodedToken.id;
+
+    const {name, linkVideo, images, categories, cookTime, ingredients, steps} = req.body
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    try {
+
+      const user = await User.findById(isUser);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const id = req.params.id
+      if (!id) {
+        return res.status(404).json({ error: "Receipe not found" });
+      }
+      const recipe = await Recipe.findByIdAndUpdate(id, {
+        name: name,
+        linkVideo: linkVideo,
+        images: images,
+        categories: categories,
+        cookTime: cookTime,
+        ingredients: ingredients,
+        steps: steps,
+        author: isUser,
+      })
+      await recipe.save()
+
+      res.status(200).json({ msg: 'Edit was recipe successfully' });
+
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+
+  async delete(req, res) {
+    const authHeader = req.get("Authorization");
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const isUser = decodedToken.id;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    try {
+
+      const user = await User.findById(isUser);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const id = req.params.id
+
+      if (!id) {
+        return res.status(404).json({ error: "Receipe not found" });
+      }
+
+      const recipe = await Recipe.findById(id)
+      
+      if (!recipe) {
+        return res.status(404).json({ error: "Receipe not found" });
+      }
+
+      await recipe.remove()
+      res.status(200).json({ msg: 'Delete was recipe successfully' });
+
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+
+  // [GET] /api/post
+  async list(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+  const options = {}
+  if(req.query.name) {
+    options.name = {
+      $regex: '.*' + req.query.name + '.*'
+    }
+  }
+  try {
+    const data = await Recipe.find(options).sort({ createdAt: 'descending' })
+    res.status(200).json({ msg: 'get recipe list success', data });
+
+  } catch (error) {
+    return res.status(500).json({ errors: [{ msg: error }] });
+  }
+},
+
 };
 
 module.exports = RecipeController;

@@ -10,5 +10,8 @@ router.get("/diner", verifyAccessToken, RecipeController.getDiner);
 router.get("/diet", verifyAccessToken, RecipeController.getDiet);
 router.get("/recent", verifyAccessToken, RecipeController.getRecentRecipe);
 router.get("/trending", verifyAccessToken, RecipeController.trendingNow);
+router.get("/", verifyAccessToken, RecipeController.list);
+router.put("/:id", verifyAccessToken, RecipeController.edit)
+router.delete("/:id", verifyAccessToken, RecipeController.delete)
 
 module.exports = router;
