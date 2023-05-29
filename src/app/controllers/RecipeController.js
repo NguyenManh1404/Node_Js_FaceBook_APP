@@ -231,78 +231,98 @@ const RecipeController = {
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
-   try {
-     const authHeader = req.get("Authorization");
-     const token = authHeader.split(" ")[1];
-     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-     console.log(decodedToken);
-     const userId = decodedToken.id;
-    const topRecipes = await Favorite.aggregate([
-      { $group: { _id: "$recipeId", count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 10 },
-      {
-        $lookup: {
-          from: "recipes",
-          localField: "_id",
-          foreignField: "_id",
-          as: "recipe",
+    try {
+      const authHeader = req.get("Authorization");
+      const token = authHeader.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      console.log(decodedToken);
+      const userId = decodedToken.id;
+      const topRecipes = await Favorite.aggregate([
+        { $group: { _id: "$recipeId", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 },
+        {
+          $lookup: {
+            from: "recipes",
+            localField: "_id",
+            foreignField: "_id",
+            as: "recipe",
+          },
         },
-      },
-      { $unwind: "$recipe" },
-      {
-        $lookup: {
-          from: "favorites",
-          let: { recipeId: "$recipe._id", userId: userId },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$recipeId", "$$recipeId"] },
-                    { $eq: ["$userId", "$$userId"] },
-                  ],
+        { $unwind: "$recipe" },
+        {
+          $lookup: {
+            from: "favorites",
+            let: { recipeId: "$recipe._id", userId: userId },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$recipeId", "$$recipeId"] },
+                      { $eq: ["$userId", "$$userId"] },
+                    ],
+                  },
                 },
               },
-            },
-            { $limit: 1 },
-          ],
-          as: "favorite",
-        },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "recipe.author",
-          foreignField: "_id",
-          as: "author",
-        },
-      },
-      {
-        $addFields: {
-          isFavorited: {
-            $cond: { if: { $size: "$favorite" }, then: true, else: false },
+              { $limit: 1 },
+            ],
+            as: "favorite",
           },
-          authorId: { $arrayElemAt: ["$author._id", 0] },
-          authorFirstName: { $arrayElemAt: ["$author.firstName", 0] },
-          authorAvatar: { $arrayElemAt: ["$author.avatar", 0] },
         },
-      },
-      {
-        $project: {
-          "recipe._id": 0,
-          "recipe.createdAt": 0,
-          "recipe.updatedAt": 0,
-          favorite: 0,
-          author: 0,
+        {
+          $lookup: {
+            from: "users",
+            localField: "recipe.author",
+            foreignField: "_id",
+            as: "author",
+          },
         },
-      },
-    ]);
+        {
+          $addFields: {
+            isFavorited: {
+              $cond: { if: { $size: "$favorite" }, then: true, else: false },
+            },
+            authorId: { $arrayElemAt: ["$author._id", 0] },
+            authorFirstName: { $arrayElemAt: ["$author.firstName", 0] },
+            authorAvatar: { $arrayElemAt: ["$author.avatar", 0] },
+          },
+        },
+        {
+          $project: {
+            "recipe._id": 0,
+            "recipe.createdAt": 0,
+            "recipe.updatedAt": 0,
+            favorite: 0,
+            author: 0,
+          },
+        },
+      ]);
 
-     res.status(200).json({ msg: "get post list success", topRecipes });
-   } catch (error) {
-     return res.status(500).json({ errors: [{ msg: error }] });
-   }
+      res.status(200).json({ msg: "get post list success", topRecipes });
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+
+  //[GET] recipe/detail/:id
+  async getRecipeById(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    try {
+      const authHeader = req.get("Authorization");
+      const token = authHeader.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      console.log(decodedToken);
+      const recipeId = req.params.id;
+      console.log(recipeId);
+      const recipe = await Recipe.find({ _id: recipeId });
+      return res.status(200).json(recipe);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ errors: [{ msg: err }] });
+    }
   },
 
   async edit(req, res) {
