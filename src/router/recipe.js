@@ -11,6 +11,7 @@ router.get("/diet", verifyAccessToken, RecipeController.getDiet);
 router.get("/recent", verifyAccessToken, RecipeController.getRecentRecipe);
 router.get("/trending", verifyAccessToken, RecipeController.trendingNow);
 router.get("/", verifyAccessToken, RecipeController.list);
+router.get("/get-recipe-current-user", verifyAccessToken, RecipeController.getListRecipeCurrentUser);
 router.put("/:id", verifyAccessToken, RecipeController.edit)
 router.delete("/:id", verifyAccessToken, RecipeController.delete)
 router.get("/detail/:id", verifyAccessToken, RecipeController.getRecipeById);
