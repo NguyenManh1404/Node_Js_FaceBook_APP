@@ -1,6 +1,7 @@
 const User = require("../../models/User");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
+const Follower = require("../../models/Follower");
 
 const UserController = {
   // [GET] /api/user
@@ -83,6 +84,33 @@ const UserController = {
 
     if (data) {
       res.status(200).json({ msg: "get user", data });
+    } else {
+      res.status(200).json({ msg: "user not found" });
+    }
+  },
+
+  async getDetailUser(req, res) {
+    const authHeader = req.get("Authorization");
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const idUser = decodedToken.id;
+    const id = req.params.id;
+
+    let follower = false;
+
+    const checkFollower = await Follower.find({
+      idUser: idUser,
+      idUserFollower: id
+    })
+
+    if (checkFollower.length > 0) {
+      follower = true;
+    }
+
+    const data = await User.findById(id);
+
+    if (data) {
+      res.status(200).json({ msg: "get user", data, follower: follower });
     } else {
       res.status(200).json({ msg: "user not found" });
     }
