@@ -417,6 +417,37 @@ const RecipeController = {
   }
 },
 
+  // [GET] /api/recipe/get-recipe-current-user
+  async getListRecipeCurrentUser(req, res) {
+    const authHeader = req.get("Authorization");
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const idUser = decodedToken.id;
+    if (!idUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  
+    const options = {}
+    if(req.query.name) {
+      options.name = {
+        $regex: '.*' + req.query.name + '.*'
+      }
+    }
+    
+    options.author = idUser;
+
+    try {
+      const data = await Recipe.find(options).sort({ createdAt: 'descending' })
+      res.status(200).json({ msg: 'get recipe list success', data });
+  
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+  
+
 };
 
 module.exports = RecipeController;
