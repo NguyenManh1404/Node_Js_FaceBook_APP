@@ -13,5 +13,6 @@ router.get("/trending", verifyAccessToken, RecipeController.trendingNow);
 router.get("/", verifyAccessToken, RecipeController.list);
 router.put("/:id", verifyAccessToken, RecipeController.edit)
 router.delete("/:id", verifyAccessToken, RecipeController.delete)
+router.get("/detail/:id", verifyAccessToken, RecipeController.getRecipeById);
 
 module.exports = router;
