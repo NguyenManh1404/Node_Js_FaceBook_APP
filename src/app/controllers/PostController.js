@@ -26,7 +26,7 @@ const PostController = {
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     const options = {}
-    if(req.query.contentPost) {
+    if (req.query.contentPost) {
       options.contentPost = {
         $regex: '.*' + req.query.contentPost + '.*'
       }
@@ -41,20 +41,20 @@ const PostController = {
     }
   },
 
-    // [GET] /api/post/trending-now
-    async trendingNow(req, res) {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-      try {
-        const data = await Post.find({
-          statusPost: true
-        }).sort({ lovePost: 'descending' })
-        res.status(200).json({ msg: 'get post list success', data });
-  
-      } catch (error) {
-        return res.status(500).json({ errors: [{ msg: error }] });
-      }
-    },
+  // [GET] /api/post/trending-now
+  async trendingNow(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    try {
+      const data = await Post.find({
+        statusPost: true
+      }).sort({ lovePost: 'descending' })
+      res.status(200).json({ msg: 'get post list success', data });
+
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
 
   // [POST] /api/post
   async store(req, res) {
@@ -91,7 +91,7 @@ const PostController = {
     }
   },
 
-    // [GET] /api/post
+  // [GET] /api/post
   async getPostCurrentUser(req, res) {
     const authHeader = req.get("Authorization");
     const token = authHeader.split(" ")[1];
@@ -111,42 +111,37 @@ const PostController = {
     }
   },
 
-    // [GET] /api/post/not-approved
-    async notApproved(req, res) {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-  
-      const options = {}
-      if(req.query.contentPost) {
-        options.contentPost = {
-          $regex: '.*' + req.query.contentPost + '.*'
-        }
-      }
-      options.statusPost = false;
-      try {
-        const data = await Post.find(options).sort({ createdAt: 'descending' })
-        res.status(200).json({ msg: 'get post list success', data });
-  
-      } catch (error) {
-        return res.status(500).json({ errors: [{ msg: error }] });
-      }
-    },
-
-      // [POST] /api/post/approve/:id
-  async approve(req, res) {
-    const authHeader = req.get("Authorization");
-    const token = authHeader.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    const idAdmin = decodedToken.id;
-
+  // [GET] /api/post/not-approved
+  async notApproved(req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-    try {
 
-      const admin = await Admin.findById(idAdmin);
-      if (!admin) {
-        return res.status(404).json({ error: "Admin not found" });
+    const options = {}
+    if (req.query.contentPost) {
+      options.contentPost = {
+        $regex: '.*' + req.query.contentPost + '.*'
       }
+    }
+    options.statusPost = false;
+    try {
+      const data = await Post.find(options).sort({ createdAt: 'descending' })
+      res.status(200).json({ msg: 'get post list success', data });
+
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+
+  // [POST] /api/post/approve/:id
+  async approve(req, res) {
+    // const authHeader = req.get("Authorization");
+    // const token = authHeader.split(" ")[1];
+    // const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    // const idAdmin = decodedToken.id;
+
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    try {
       const id = req.params.id
       const post = await Post.findByIdAndUpdate(id, {
         statusPost: true
@@ -156,22 +151,23 @@ const PostController = {
       res.status(200).json({ msg: 'Post was approved successfully' });
 
     } catch (error) {
+      console.log(error);
       return res.status(500).json({ errors: [{ msg: error }] });
     }
   },
 
-    // [GET] /api/not-approve/:id
-    async notApproveDetail(req, res) {
-      const { id } = req.params
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-      try {
-        const data = await Post.find({ _id: id, statusPost: false })
-        res.status(200).json({ msg: 'get post detail success', data });
-      } catch (error) {
-        return res.status(500).json({ errors: [{ msg: error }] });
-      }
-    },
+  // [GET] /api/not-approve/:id
+  async notApproveDetail(req, res) {
+    const { id } = req.params
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    try {
+      const data = await Post.find({ _id: id, statusPost: false })
+      res.status(200).json({ msg: 'get post detail success', data });
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
 
 }
 

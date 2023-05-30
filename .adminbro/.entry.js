@@ -17,9 +17,7 @@ import Component8 from '../src/admin/component/Post/PostImage'
 AdminBro.UserComponents.Component8 = Component8
 import Component9 from '../src/admin/component/Post/PostStatus'
 AdminBro.UserComponents.Component9 = Component9
-import Component10 from '../src/admin/component/Post/PostList'
+import Component10 from '../src/admin/pages/Custom'
 AdminBro.UserComponents.Component10 = Component10
 import Component11 from '../src/admin/pages/Custom'
 AdminBro.UserComponents.Component11 = Component11
-import Component12 from '../src/admin/pages/Custom'
-AdminBro.UserComponents.Component12 = Component12

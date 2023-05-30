@@ -66,16 +66,23 @@ const resources = [
           },
         },
       },
-      actions: {
-        newAction: {
-          actionType: ['record'],
-          label: 'Publish',
-          icon: 'fas fa-eye',
-          isVisible: true,
-          handler: async () => { },
-          component: AdminBro.bundle('./component/Post/PostList'),
-        },
-      },
+      // actions: {
+      //   approve: {
+      //     actionType: ['record'],
+      //     label: 'Publish',
+      //     icon: 'fas fa-eye',
+      //     isVisible: true,
+      //     handler: async (request, response, context) => {
+
+      //       return {
+      //         record: request,
+      //       }
+      //     },
+      //     before: [],
+      //     after: null,
+      //     //component: AdminBro.bundle('./component/Post/PostList'),
+      //   },
+      // },
     }
   },
   Category, Recipe]
