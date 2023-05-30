@@ -11,7 +11,7 @@ router.get("/:id", verifyAccessToken, PostController.detail);
 router.post("/upload", verifyAccessToken, validator.post, PostController.store);
 router.get("/get-post-current-user/:id", verifyAccessToken, PostController.getPostCurrentUser);
 router.get("/not-approved", verifyAccessTokenAdmin, PostController.notApproved);
-router.put("/approve/:id", verifyAccessTokenAdmin, PostController.approve);
+router.put("/approve/:id", PostController.approve);
 router.get("/not-approve/:id", verifyAccessTokenAdmin, PostController.notApproveDetail);
 
 
