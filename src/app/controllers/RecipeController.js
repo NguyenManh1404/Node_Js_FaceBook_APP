@@ -318,7 +318,21 @@ const RecipeController = {
       const recipeId = req.params.id;
       console.log(recipeId);
       const recipe = await Recipe.find({ _id: recipeId });
-      return res.status(200).json(recipe);
+
+      let favorite = false;
+
+      const checkFavorite = await Favorite.find({
+        userId: decodedToken.id,
+        recipeId: recipeId
+      })
+
+      if (checkFavorite.length > 0) {
+        favorite = true
+      }
+
+      return res.status(200).json({
+        "msg": "Get recipe successfully", recipe, isFavorite: favorite
+      });
     } catch (err) {
       console.error(err);
       return res.status(500).json({ errors: [{ msg: err }] });
