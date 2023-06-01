@@ -85,7 +85,28 @@ const resources = [
       // },
     }
   },
-  Category, Recipe]
+  Category,
+  {
+    resource: Post,
+    options: {
+      listProperties: ['imagePost', 'statusPost'],
+      parent: postManage,
+      toolbar: DefaultQuillToolbarOptions,
+      properties: {
+        imagePost: {
+          components: {
+            list: AdminBro.bundle('./component/Post/PostImage'),
+            show: AdminBro.bundle('./component/Post/PostImage'),
+          },
+        },
+        statusPost: {
+          components: {
+            list: AdminBro.bundle('./component/Post/PostStatus'),
+          },
+        },
+      },
+    }
+  }]
 
 const pages =
 {
