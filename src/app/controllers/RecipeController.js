@@ -53,9 +53,11 @@ const RecipeController = {
       console.log(decodedToken);
       const userId = decodedToken.id;
 
-      const recipes = await Recipe.find({ categories: "1" }).sort({
-        updatedAt: -1,
-      }).lean();
+      const recipes = await Recipe.find({ categories: "1" })
+        .sort({
+          updatedAt: -1,
+        })
+        .lean();
 
       // Loop through each recipe and check if it is a favorite for the user
       for (const recipe of recipes) {
@@ -63,7 +65,7 @@ const RecipeController = {
           userId: userId,
           recipeId: recipe._id,
         });
-      recipe.isFavorite = isFavorite ? true : false;
+        recipe.isFavorite = isFavorite ? true : false;
       }
 
       res.status(200).json({ msg: "Get list recipe successfully", recipes });
@@ -184,10 +186,8 @@ const RecipeController = {
       console.log(decodedToken);
       const userId = decodedToken.id;
 
-      const recipes = await Recipe.find()
-        .sort({ updatedAt: -1 })
-        .limit(10);
-        // Sử dụng .lean() để chuyển đổi kết quả từ Object Mongoose thành JavaScript object; // Thêm phương thức .limit(10) để giới hạn kết quả trả về là 10
+      const recipes = await Recipe.find().sort({ updatedAt: -1 }).limit(10);
+      // Sử dụng .lean() để chuyển đổi kết quả từ Object Mongoose thành JavaScript object; // Thêm phương thức .limit(10) để giới hạn kết quả trả về là 10
 
       // Lấy danh sách userId của người tạo trong các công thức
       const userIds = recipes.map((recipe) => recipe.author);
@@ -201,7 +201,7 @@ const RecipeController = {
         creatorMap[creator._id] = creator.firstName;
       });
 
-    const favorites = await Favorite.find({ userId });
+      const favorites = await Favorite.find({ userId });
 
       const favoriteRecipeIds = favorites.map((favorite) =>
         favorite.recipeId.toString()
@@ -226,8 +226,241 @@ const RecipeController = {
     }
   },
 
-  //[POST]
+  //[GET] /api/recipe/trending
+  async trendingNow(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    try {
+      const authHeader = req.get("Authorization");
+      const token = authHeader.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      console.log(decodedToken);
+      const userId = decodedToken.id;
+      const topRecipes = await Favorite.aggregate([
+        { $group: { _id: "$recipeId", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 10 },
+        {
+          $lookup: {
+            from: "recipes",
+            localField: "_id",
+            foreignField: "_id",
+            as: "recipe",
+          },
+        },
+        { $unwind: "$recipe" },
+        {
+          $lookup: {
+            from: "favorites",
+            let: { recipeId: "$recipe._id", userId: userId },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$recipeId", "$$recipeId"] },
+                      { $eq: ["$userId", "$$userId"] },
+                    ],
+                  },
+                },
+              },
+              { $limit: 1 },
+            ],
+            as: "favorite",
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "recipe.author",
+            foreignField: "_id",
+            as: "author",
+          },
+        },
+        {
+          $addFields: {
+            isFavorited: {
+              $cond: { if: { $size: "$favorite" }, then: true, else: false },
+            },
+            authorId: { $arrayElemAt: ["$author._id", 0] },
+            authorFirstName: { $arrayElemAt: ["$author.firstName", 0] },
+            authorAvatar: { $arrayElemAt: ["$author.avatar", 0] },
+          },
+        },
+        {
+          $project: {
+            "recipe._id": 0,
+            "recipe.createdAt": 0,
+            "recipe.updatedAt": 0,
+            favorite: 0,
+            author: 0,
+          },
+        },
+      ]);
 
+      res.status(200).json({ msg: "get post list success", topRecipes });
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+
+  //[GET] recipe/detail/:id
+  async getRecipeById(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    try {
+      const authHeader = req.get("Authorization");
+      const token = authHeader.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      console.log(decodedToken);
+      const recipeId = req.params.id;
+      console.log(recipeId);
+      const recipe = await Recipe.find({ _id: recipeId });
+
+      let favorite = false;
+
+      const checkFavorite = await Favorite.find({
+        userId: decodedToken.id,
+        recipeId: recipeId
+      })
+
+      if (checkFavorite.length > 0) {
+        favorite = true
+      }
+
+      return res.status(200).json({
+        "msg": "Get recipe successfully", recipe, isFavorite: favorite
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ errors: [{ msg: err }] });
+    }
+  },
+
+  async edit(req, res) {
+    const authHeader = req.get("Authorization");
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const isUser = decodedToken.id;
+
+    const {name, linkVideo, images, categories, cookTime, ingredients, steps} = req.body
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    try {
+
+      const user = await User.findById(isUser);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const id = req.params.id
+      if (!id) {
+        return res.status(404).json({ error: "Receipe not found" });
+      }
+      const recipe = await Recipe.findByIdAndUpdate(id, {
+        name: name,
+        linkVideo: linkVideo,
+        images: images,
+        categories: categories,
+        cookTime: cookTime,
+        ingredients: ingredients,
+        steps: steps,
+        author: isUser,
+      })
+      await recipe.save()
+
+      res.status(200).json({ msg: 'Edit was recipe successfully' });
+
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+
+  async delete(req, res) {
+    const authHeader = req.get("Authorization");
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const isUser = decodedToken.id;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    try {
+
+      const user = await User.findById(isUser);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const id = req.params.id
+
+      if (!id) {
+        return res.status(404).json({ error: "Receipe not found" });
+      }
+
+      const recipe = await Recipe.findById(id)
+      
+      if (!recipe) {
+        return res.status(404).json({ error: "Receipe not found" });
+      }
+
+      await recipe.remove()
+      res.status(200).json({ msg: 'Delete was recipe successfully' });
+
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+
+  // [GET] /api/post
+  async list(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+  const options = {}
+  if(req.query.name) {
+    options.name = {
+      $regex: '.*' + req.query.name + '.*'
+    }
+  }
+  try {
+    const data = await Recipe.find(options).sort({ createdAt: 'descending' })
+    res.status(200).json({ msg: 'get recipe list success', data });
+
+  } catch (error) {
+    return res.status(500).json({ errors: [{ msg: error }] });
+  }
+},
+
+  // [GET] /api/recipe/get-recipe-current-user
+  async getListRecipeCurrentUser(req, res) {
+    const authHeader = req.get("Authorization");
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const idUser = decodedToken.id;
+    if (!idUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  
+    const options = {}
+    if(req.query.name) {
+      options.name = {
+        $regex: '.*' + req.query.name + '.*'
+      }
+    }
+    
+    options.author = idUser;
+
+    try {
+      const data = await Recipe.find(options).sort({ createdAt: 'descending' })
+      res.status(200).json({ msg: 'get recipe list success', data });
+  
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+  
 
 };
 

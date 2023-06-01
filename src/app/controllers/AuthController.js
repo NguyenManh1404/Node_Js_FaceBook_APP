@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt"); // thư viện để Hash password
 const JWT = require("jsonwebtoken"); // thư viện để create token
 const transporter = require("../../../config/nodemailler");
 const passport = require("passport");
+const Installation = require("../../models/Installation");
 
 const AuthController = {
   // [POST] /api/auth/register
@@ -185,6 +186,12 @@ const AuthController = {
           .json({ errors: [{ message: "User do not exist" }] });
       }
 
+      if (user.status === false) {
+        return res
+          .status(400)
+          .json({ errors: [{ message: "User is block" }] });
+      }
+
       // Compare hased password with user password to see if they are valid
       const isMatch = await bcrypt.compareSync(password, user.password);
 
@@ -213,7 +220,37 @@ const AuthController = {
         }
       );
 
-      return res.json({ user, accessToken, refreshToken });
+      let installation = {};
+      let device = {}
+      // let checkExistDevice = {}
+      const checkExistDevice = await Installation.find({
+        userID: user.id,
+        tokenDevice: req.body?.tokenDevice
+      });
+
+      if (checkExistDevice.length == 0) {
+        installation = await new Installation({
+          userID: user.id,
+          tokenDevice: req.body?.tokenDevice
+        });
+  
+        await installation.save();
+        device = installation
+      }
+
+
+      if (checkExistDevice.length > 0) {
+        checkExistDevice.map((value) => {
+          device = value;
+        })
+      }
+
+      return res.json({ 
+        user, 
+        accessToken, 
+        refreshToken, 
+        device
+      });
     } catch (error) {
       return res
         .status(500)

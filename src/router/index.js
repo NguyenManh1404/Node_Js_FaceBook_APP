@@ -8,8 +8,8 @@ const recipeRouter = require("./recipe");
 const favoriteRouter = require("./favorite");
 const followerRouter = require('./follower')
 const commentRouter = require('./comment')
+const installRouter = require('./install')
 
-const UserController = require("../app/controllers/UserController");
 const routes = (app) => {
   app.use("/api/auth", authRouter);
   app.use("/api/auth-admin", authAdminRouter);
@@ -20,6 +20,7 @@ const routes = (app) => {
   app.use("/api/user", userRouter);
   app.use("/api/follower", followerRouter);
   app.use("/api/comment", commentRouter);
+  app.use("/api/install", installRouter);
 };
 
 module.exports = routes;
