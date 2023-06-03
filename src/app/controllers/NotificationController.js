@@ -52,7 +52,7 @@ const NotificationController = {
 
     const message = {
       notification: {
-        title: "Chuc Nga ngu Ngon",
+        title: "Demo Notification",
         body: follower,
         imageUrl: "https://foo.bar.pizza-monster.png",
       },
