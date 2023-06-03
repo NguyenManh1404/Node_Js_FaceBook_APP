@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Follower = require("../../models/Follower");
 const NotificationController = require("../controllers/NotificationController");
 const User = require("../../models/User");
+const Installation = require("../../models/Installation");
 const admin = require("../../../config/pushnotification");
 
 const FollowerController = {
@@ -36,19 +37,25 @@ const FollowerController = {
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
     try {
-      const { idUserFollower, deviceToken} = req.body;
+      const { idUserFollower } = req.body;
 
       const user = await User.findById(idUser);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
 
+      const tokens = await Installation.find({ userID: idUserFollower }).select(
+        "tokenDevice"
+      );
+  
+      const tokenDevices = tokens.map((item) => item.tokenDevice);
+  
       const userFollower = await User.findById(idUserFollower);
+
       if (!userFollower) {
         return res.status(404).json({ error: "Recipe not found" });
       }
 
-      console.log("idUserFollower", idUserFollower);
 
       const newFollower = await new Follower({
         idUser: idUser,
@@ -57,15 +64,11 @@ const FollowerController = {
       await newFollower.save();
 
       /// Get Notification
-      // const follower = {
-      //   name: req.body.name,
-      //   name_follower: req.body.name_follower,
-      // };
 
       const message = {
         notification: {
-          title: "Master Meal",
-          body: "NOTI FOLLOW",
+          title: `${userFollower?.firstName} followed  ${user?.firstName} `,
+          body: `You have been followed by ${userFollower?.firstName} . You are on the top trending`,
           imageUrl: "https://foo.bar.pizza-monster.png",
         },
         android: {
@@ -79,20 +82,19 @@ const FollowerController = {
             image: "https://foo.bar.pizza-monster.png",
           },
         },
-        token:
-          "c2vl3-NzTH-wwbxT0hjmX2:APA91bHPSEa-V26HBLHJkXafVyzL0zSUn_9NAtHM8kPJUK_x3KmAHEziCzCHufCN9PTrFTjDtD5-OByGPDhwK3FPdYTe9iDHbozdCeWP_vcAJ4m5VqubJ4yp8UKqBtwHMawoUH2q88V9",
+        tokens: tokenDevices,
       };
 
-      admin
+      await admin
         .messaging()
-        .send(message)
+        .sendEachForMulticast(message)
         .then((response) => {
           console.log("Message sent successfully:", response);
         })
         .catch((error) => {
           console.log("Error sending message:", error);
         });
-      /// Get Notification
+
 
       res.status(200).json({ msg: "Follower was created successfully" });
     } catch (error) {
@@ -122,8 +124,6 @@ const FollowerController = {
         if (!userFollower) {
           return res.status(404).json({ error: "Recipe not found" });
         }
-  
-        console.log('idUserFollower', idUserFollower);
         const follower = await Follower.findOne({
           idUser: idUser,
           idUserFollower: idUserFollower
