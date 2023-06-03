@@ -1,6 +1,7 @@
 
 const admin = require('../../../config/pushnotification')
-const express = require('express')
+const express = require('express');
+const Installation = require('../../models/Installation');
 
 
 const NotificationController = {
@@ -51,7 +52,7 @@ const NotificationController = {
 
     const message = {
       notification: {
-        title: "Chuc Nga ngu Ngon",
+        title: "Demo Notification",
         body: follower,
         imageUrl: "https://foo.bar.pizza-monster.png",
       },
@@ -70,6 +71,15 @@ const NotificationController = {
         req.body.token,
     };
  
+
+    const authHeader = req.get("Authorization");
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    const install = await Installation.find({
+      userID: decodedToken
+    });
+
     admin
       .messaging()
       .send(message)
@@ -80,7 +90,7 @@ const NotificationController = {
         console.log("Error sending message:", error);
       });
  
-     return res.json({ name: "Hug Manh", password: "get notify" });
+     return res.json({ name: "Hug Manh", password: "get notify", device: install });
    },
 
   
