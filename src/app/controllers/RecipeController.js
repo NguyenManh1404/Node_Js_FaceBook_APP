@@ -3,6 +3,8 @@ const User = require("../../models/User");
 const Favorite = require("../../models/Favorite");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const mongoose = require('mongoose');
+
 const RecipeController = {
   // [POST] /api/recipe/create
   async create(req, res) {
@@ -299,9 +301,28 @@ const RecipeController = {
         },
       ]);
 
-      res.status(200).json({ msg: "get post list success", topRecipes });
+      console.log(topRecipes)
+
+      const recipeIds = topRecipes.map(recipe => mongoose.Types.ObjectId(recipe._id));
+
+      // Find the favorites for the user and the recipeIds
+      const favorites = await Favorite.find({
+        userId: userId,
+        recipeId: { $in: recipeIds },
+      });
+
+      // Create a Set of favorited recipeIds for faster lookup
+      const favoritedRecipeIds = new Set(favorites.map(favorite => favorite.recipeId.toString()));
+
+      // Update the isFavorited field for each recipe in topRecipes
+      const updatedTopRecipes = topRecipes.map(recipe => {
+        recipe.isFavorited = favoritedRecipeIds.has(recipe._id.toString());
+        return recipe;
+      });
+      res.status(200).json({ msg: "get post list success", updatedTopRecipes });
+
     } catch (error) {
-      return res.status(500).json({ errors: [{ msg: error }] });
+      return res.status(500).json({ errors: [{ msg: error.message }] });
     }
   },
 
@@ -345,7 +366,7 @@ const RecipeController = {
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     const isUser = decodedToken.id;
 
-    const {name, linkVideo, images, categories, cookTime, ingredients, steps} = req.body
+    const { name, linkVideo, images, categories, cookTime, ingredients, steps } = req.body
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -398,7 +419,7 @@ const RecipeController = {
       }
 
       const recipe = await Recipe.findById(id)
-      
+
       if (!recipe) {
         return res.status(404).json({ error: "Receipe not found" });
       }
@@ -413,23 +434,23 @@ const RecipeController = {
 
   // [GET] /api/post
   async list(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-  const options = {}
-  if(req.query.name) {
-    options.name = {
-      $regex: '.*' + req.query.name + '.*'
+    const options = {}
+    if (req.query.name) {
+      options.name = {
+        $regex: '.*' + req.query.name + '.*'
+      }
     }
-  }
-  try {
-    const data = await Recipe.find(options).sort({ createdAt: 'descending' })
-    res.status(200).json({ msg: 'get recipe list success', data });
+    try {
+      const data = await Recipe.find(options).sort({ createdAt: 'descending' })
+      res.status(200).json({ msg: 'get recipe list success', data });
 
-  } catch (error) {
-    return res.status(500).json({ errors: [{ msg: error }] });
-  }
-},
+    } catch (error) {
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
 
   // [GET] /api/recipe/get-recipe-current-user
   async getListRecipeCurrentUser(req, res) {
@@ -442,25 +463,25 @@ const RecipeController = {
     }
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-  
+
     const options = {}
-    if(req.query.name) {
+    if (req.query.name) {
       options.name = {
         $regex: '.*' + req.query.name + '.*'
       }
     }
-    
+
     options.author = idUser;
 
     try {
       const data = await Recipe.find(options).sort({ createdAt: 'descending' })
       res.status(200).json({ msg: 'get recipe list success', data });
-  
+
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
     }
   },
-  
+
 
 };
 
