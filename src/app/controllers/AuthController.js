@@ -220,36 +220,36 @@ const AuthController = {
         }
       );
 
-      // let installation = {};
-      // let device = {}
-      // // let checkExistDevice = {}
-      // const checkExistDevice = await Installation.find({
-      //   userID: user.id,
-      //   tokenDevice: req.body?.tokenDevice
-      // });
+      let installation = {};
+      let device = {}
+      // let checkExistDevice = {}
+      const checkExistDevice = await Installation.find({
+        userID: user.id,
+        tokenDevice: req.body?.tokenDevice
+      });
 
-      // if (checkExistDevice.length == 0) {
-      //   installation = await new Installation({
-      //     userID: user.id,
-      //     tokenDevice: req.body?.tokenDevice
-      //   });
+      if (checkExistDevice.length == 0) {
+        installation = await new Installation({
+          userID: user.id,
+          tokenDevice: req.body?.tokenDevice
+        });
   
-      //   await installation.save();
-      //   device = installation
-      // }
+        await installation.save();
+        device = installation
+      }
 
 
-      // if (checkExistDevice.length > 0) {
-      //   checkExistDevice.map((value) => {
-      //     device = value;
-      //   })
-      // }
+      if (checkExistDevice.length > 0) {
+        checkExistDevice.map((value) => {
+          device = value;
+        })
+      }
 
       return res.json({ 
         user, 
         accessToken, 
         refreshToken, 
-        // device
+        device
       });
     } catch (error) {
       return res
