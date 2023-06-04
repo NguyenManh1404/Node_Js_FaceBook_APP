@@ -23,6 +23,11 @@ const PostResource = {
                     list: AdminBro.bundle('../component/Post/PostStatus'),
                 },
             },
+            statusPost: {
+                components: {
+                    list: AdminBro.bundle('../component/Post/PostStatus'),
+                },
+            },
         },
         actions: {
             list: {
