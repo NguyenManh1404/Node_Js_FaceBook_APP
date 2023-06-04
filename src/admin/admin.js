@@ -5,108 +5,25 @@ const Recipe = require("../models/Recipe");
 const { DefaultQuillToolbarOptions } = require("@admin-bro/design-system");
 const AdminBro = require('admin-bro')
 
-const postManage = {
-  name: 'Post Managerment',
-  icon: 'Image',
-}
+const UserResource = require("./resource/user");
+const PostResource = require("./resource/post");
+
+
 
 const resources = [
+  UserResource,
+  PostResource,
   {
-    resource: User,
+    resource: Recipe,
     options: {
-      listProperties: ['avatar', 'fullName', 'email', 'role', 'phoneNumber', 'createdAt', 'status'],
       parent: {
-        name: 'User Managerment',
-        icon: 'User',
+        name: 'Post Managerment',
+        icon: 'Image',
       },
-      properties: {
-        avatar: {
-          name: "Avatar",
-          components: {
-            list: AdminBro.bundle('./component/User/UserImage'),
-            show: AdminBro.bundle('./component/User/UserImage'),
-            edit: AdminBro.bundle('./component/User/AvatarUpload'),
-          },
-        },
-        fullName: {
-          name: "User name",
-          type: 'string',
-          components: {
-            list: AdminBro.bundle('./component/User/UserFullname'),
-            show: AdminBro.bundle('./component/User/UserFullname'),
-          },
-        },
-        createdAt: {
-          name: "DateCreater",
-        },
-        status: {
-          components: {
-            list: AdminBro.bundle('./component/User/UserStatus'),
-          },
-        }
-      },
+      toolbar: DefaultQuillToolbarOptions,
     }
   },
-  {
-    resource: Post,
-    options: {
-      listProperties: ['imagePost', 'statusPost'],
-      parent: postManage,
-      toolbar: DefaultQuillToolbarOptions,
-      properties: {
-        imagePost: {
-          components: {
-            list: AdminBro.bundle('./component/Post/PostImage'),
-            show: AdminBro.bundle('./component/Post/PostImage'),
-          },
-        },
-        statusPost: {
-          components: {
-            list: AdminBro.bundle('./component/Post/PostStatus'),
-          },
-        },
-      },
-      // actions: {
-      //   approve: {
-      //     actionType: ['record'],
-      //     label: 'Publish',
-      //     icon: 'fas fa-eye',
-      //     isVisible: true,
-      //     handler: async (request, response, context) => {
-
-      //       return {
-      //         record: request,
-      //       }
-      //     },
-      //     before: [],
-      //     after: null,
-      //     //component: AdminBro.bundle('./component/Post/PostList'),
-      //   },
-      // },
-    }
-  },
-  Category,
-  {
-    resource: Post,
-    options: {
-      listProperties: ['imagePost', 'statusPost'],
-      parent: postManage,
-      toolbar: DefaultQuillToolbarOptions,
-      properties: {
-        imagePost: {
-          components: {
-            list: AdminBro.bundle('./component/Post/PostImage'),
-            show: AdminBro.bundle('./component/Post/PostImage'),
-          },
-        },
-        statusPost: {
-          components: {
-            list: AdminBro.bundle('./component/Post/PostStatus'),
-          },
-        },
-      },
-    }
-  }]
+  Category]
 
 const pages =
 {

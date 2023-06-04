@@ -75,14 +75,22 @@ const uploadMiddleware = multer({
     dashboard,
     pages,
     branding: {
-      companyName: 'Amazing c.o.',
-    }
+      companyName: 'MealMaster',
+      logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1qtDWfho5gnoUUmX1SVEiurGyrgTzI1OuIQ&usqp=CAU', // Replace with your logo URL
+      softwareBrothers: false, // Set to true if you want to display the "Powered by SoftwareBrothers" text
+    },
+    locale: {
+      labels: {
+        loginWelcome: 'Welcome to MealMaster Admin',
+      },
+    },
+
   })
 
 
   app.use(adminBro.options.rootPath, AdminBroExpress.buildAuthenticatedRouter(adminBro, {
     authenticate: AuthController.checkUserMatch,
-    cookiePassword: process.env.COOKIE_SEC,
+    cookiePassword: process.env.ACCESS_TOKEN_SECRET,
   }));
 
   app.use('/api-docs', swaggerUi.serve);
