@@ -9,15 +9,13 @@ import Component4 from '../src/admin/component/User/UserFullname'
 AdminBro.UserComponents.Component4 = Component4
 import Component5 from '../src/admin/component/User/UserFullname'
 AdminBro.UserComponents.Component5 = Component5
-import Component6 from '../src/admin/component/User/UserStatus'
+import Component6 from '../src/admin/component/Post/PostImage'
 AdminBro.UserComponents.Component6 = Component6
 import Component7 from '../src/admin/component/Post/PostImage'
 AdminBro.UserComponents.Component7 = Component7
-import Component8 from '../src/admin/component/Post/PostImage'
+import Component8 from '../src/admin/component/Post/PostStatus'
 AdminBro.UserComponents.Component8 = Component8
-import Component9 from '../src/admin/component/Post/PostStatus'
+import Component9 from '../src/admin/pages/Custom'
 AdminBro.UserComponents.Component9 = Component9
 import Component10 from '../src/admin/pages/Custom'
 AdminBro.UserComponents.Component10 = Component10
-import Component11 from '../src/admin/pages/Custom'
-AdminBro.UserComponents.Component11 = Component11

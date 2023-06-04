@@ -147,22 +147,22 @@ const AuthController = {
 
   async checkUserMatch(email, password) {
     try {
-      const user = await User.findOne({ email: email });
+      const user = await User.findOne({ email });
 
       // user not found
       if (!user) {
-        return res
-          .status(400)
-          .json({ errors: [{ message: "User do not exist" }] });
+        throw new Error("user is not exist");
       }
 
       // Compare hased password with user password to see if they are valid
       const isMatch = await bcrypt.compareSync(password, user.password);
 
-      if (!isMatch) {
+      if (isMatch) {
         return user
       }
+      return null
     } catch (error) {
+      console.log(error);
       return null
     }
   },
@@ -233,7 +233,7 @@ const AuthController = {
           userID: user.id,
           tokenDevice: req.body?.tokenDevice
         });
-  
+
         await installation.save();
         device = installation
       }
@@ -245,10 +245,10 @@ const AuthController = {
         })
       }
 
-      return res.json({ 
-        user, 
-        accessToken, 
-        refreshToken, 
+      return res.json({
+        user,
+        accessToken,
+        refreshToken,
         device
       });
     } catch (error) {
