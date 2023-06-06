@@ -31,6 +31,11 @@ let schema = new mongoose.Schema(
       ref: "user",
       required: true,
     },
+    status: {
+      type: Boolean,
+      required: true,
+      default: false,
+    }
   },
   {
     timestamps: true,
