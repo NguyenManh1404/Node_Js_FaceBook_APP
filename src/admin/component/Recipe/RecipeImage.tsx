@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box } from '@admin-bro/design-system'
 
-const PostImage = (props) => {
+const RecipeImage = (props) => {
     const url = props?.record?.params?.imagePost
     return (<>
         <Box>
@@ -13,4 +13,4 @@ const PostImage = (props) => {
     )
 }
 
-export default PostImage
+export default RecipeImage

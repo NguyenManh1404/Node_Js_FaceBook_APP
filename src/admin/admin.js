@@ -6,7 +6,7 @@ const { DefaultQuillToolbarOptions } = require("@admin-bro/design-system");
 const AdminBro = require('admin-bro')
 
 const UserResource = require("./resource/user");
-const PostResource = require("./resource/post");
+const PostResource = require("./resource/recipe");
 
 
 

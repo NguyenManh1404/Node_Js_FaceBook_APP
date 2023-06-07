@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useRecords, useNotice } from 'admin-bro';
 import { useHistory } from 'react-router-dom';
 
-const PostStatus = (props) => {
+const RecipeStatus = (props) => {
     const sendNotice = useNotice()
     const history = useHistory()
     const {
@@ -41,4 +41,4 @@ const PostStatus = (props) => {
     )
 }
 
-export default PostStatus
+export default RecipeStatus
