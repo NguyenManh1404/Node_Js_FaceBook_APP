@@ -5,6 +5,7 @@ const Recipe = require('../../models/Recipe');
 const PostResource = {
     resource: Recipe,
     options: {
+        listProperties: ['name', 'linkVideo', 'images', 'cookTime', 'author', 'status'],
         parent: {
             name: 'Post Managerment',
             icon: 'Image',
@@ -25,13 +26,13 @@ const PostResource = {
         },
         actions: {
             list: {
-                before: async (request, { currentAdmin }) => {
-                    request.query = {
-                        ...request.query,
-                        'filters.status': false,
-                    };
-                    return request;
-                },
+                // before: async (request, { currentAdmin }) => {
+                //     request.query = {
+                //         ...request.query,
+                //         'filters.status': false,
+                //     };
+                //     return request;
+                // },
                 after: [
                     async (response, request) => {
                         if (!(request.method.toLowerCase() === 'get')) {

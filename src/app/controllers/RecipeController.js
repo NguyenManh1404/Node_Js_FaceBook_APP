@@ -482,6 +482,28 @@ const RecipeController = {
     }
   },
 
+  async approve(req, res) {
+    // const authHeader = req.get("Authorization");
+    // const token = authHeader.split(" ")[1];
+    // const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    // const idAdmin = decodedToken.id;
+
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    try {
+      const id = req.params.id
+      const recipe = await Recipe.findByIdAndUpdate(id, {
+        status: true
+      })
+      await recipe.save()
+
+      res.status(200).json({ msg: 'recipe was approved successfully' });
+
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
 
 };
 
