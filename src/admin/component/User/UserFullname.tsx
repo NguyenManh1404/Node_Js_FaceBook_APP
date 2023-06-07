@@ -5,7 +5,7 @@ const PostImage = (props) => {
     const params = props?.record?.params
     return (<>
         <Box>
-            <p>{params?.firstName} {params?.lastName}asdasdasd</p>
+            <p>{params?.firstName} {params?.lastName}</p>
         </Box>
     </>
     )
