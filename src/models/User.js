@@ -66,7 +66,6 @@ let schema = new mongoose.Schema(
     },
     role: {
       type: String,
-      required: true,
       default: USER_ROLE.USER_ROLE,
       enum: Object.values(USER_ROLE)
     },
