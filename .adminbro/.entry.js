@@ -5,17 +5,19 @@ import Component2 from '../src/admin/component/User/UserImage'
 AdminBro.UserComponents.Component2 = Component2
 import Component3 from '../src/admin/component/User/AvatarUpload'
 AdminBro.UserComponents.Component3 = Component3
-import Component4 from '../src/admin/component/User/UserFullname'
+import Component4 from '../src/admin/component/User/AvatarUpload'
 AdminBro.UserComponents.Component4 = Component4
 import Component5 from '../src/admin/component/User/UserFullname'
 AdminBro.UserComponents.Component5 = Component5
-import Component6 from '../src/admin/component/Post/PostImage'
+import Component6 from '../src/admin/component/User/UserFullname'
 AdminBro.UserComponents.Component6 = Component6
-import Component7 from '../src/admin/component/Post/PostImage'
+import Component7 from '../src/admin/component/Recipe/RecipeImage'
 AdminBro.UserComponents.Component7 = Component7
-import Component8 from '../src/admin/component/Post/PostStatus'
+import Component8 from '../src/admin/component/Recipe/RecipeImage'
 AdminBro.UserComponents.Component8 = Component8
-import Component9 from '../src/admin/pages/Custom'
+import Component9 from '../src/admin/component/Recipe/RecipeStatus'
 AdminBro.UserComponents.Component9 = Component9
 import Component10 from '../src/admin/pages/Custom'
 AdminBro.UserComponents.Component10 = Component10
+import Component11 from '../src/admin/pages/Custom'
+AdminBro.UserComponents.Component11 = Component11

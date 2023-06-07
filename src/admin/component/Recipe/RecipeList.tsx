@@ -1,7 +1,7 @@
 import React from 'react';
 import { List } from 'admin-bro';
 
-const MyList = (props) => {
+const RecipeList = (props) => {
     const { resource, data } = props;
 
     const handleClick = (event, record) => {
@@ -29,4 +29,4 @@ const MyList = (props) => {
     );
 };
 
-export default MyList;
+export default RecipeList;

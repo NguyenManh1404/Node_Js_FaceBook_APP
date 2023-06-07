@@ -1,31 +1,25 @@
 const AdminBro = require('admin-bro');
-const Post = require('../../models/Post');
 const { DefaultQuillToolbarOptions } = require("@admin-bro/design-system");
 const User = require('../../models/User');
+const Recipe = require('../../models/Recipe');
 const PostResource = {
-    resource: Post,
+    resource: Recipe,
     options: {
-        listProperties: ['imagePost', 'statusPost'],
         parent: {
             name: 'Post Managerment',
             icon: 'Image',
         },
         toolbar: DefaultQuillToolbarOptions,
         properties: {
-            imagePost: {
+            images: {
                 components: {
-                    list: AdminBro.bundle('../component/Post/PostImage'),
-                    show: AdminBro.bundle('../component/Post/PostImage'),
+                    list: AdminBro.bundle('../component/Recipe/RecipeImage'),
+                    show: AdminBro.bundle('../component/Recipe/RecipeImage'),
                 },
             },
-            statusPost: {
+            status: {
                 components: {
-                    list: AdminBro.bundle('../component/Post/PostStatus'),
-                },
-            },
-            statusPost: {
-                components: {
-                    list: AdminBro.bundle('../component/Post/PostStatus'),
+                    list: AdminBro.bundle('../component/Recipe/RecipeStatus'),
                 },
             },
         },
@@ -34,7 +28,7 @@ const PostResource = {
                 before: async (request, { currentAdmin }) => {
                     request.query = {
                         ...request.query,
-                        'filters.statusPost': false,
+                        'filters.status': false,
                     };
                     return request;
                 },

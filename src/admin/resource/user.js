@@ -92,6 +92,7 @@ const UserResource = {
                     list: AdminBro.bundle('../component/User/UserImage'),
                     show: AdminBro.bundle('../component/User/UserImage'),
                     edit: AdminBro.bundle('../component/User/AvatarUpload'),
+                    create: AdminBro.bundle('../component/User/AvatarUpload'),
                 },
                 isVisible: {
                     filter: false,
