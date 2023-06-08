@@ -95,6 +95,10 @@ const UserResource = {
                     create: AdminBro.bundle('../component/User/AvatarUpload'),
                 },
                 isVisible: {
+                    create: true,
+                    list: true,
+                    show: true,
+                    edit: true,
                     filter: false,
                 },
             },
