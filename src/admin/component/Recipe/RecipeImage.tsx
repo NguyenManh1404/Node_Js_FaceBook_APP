@@ -2,11 +2,13 @@ import React from 'react'
 import { Box } from '@admin-bro/design-system'
 
 const RecipeImage = (props) => {
-    const url = props?.record?.params?.imagePost
+    const image = props?.record?.params["images.0"]
+    console.log(props?.record?.params);
+
     return (<>
         <Box>
-            <div style={{ width: 200, textAlign: 'center' }}>
-                <img src={url} style={{ height: 100, margin: 'auto' }} alt="" />
+            <div style={{ width: "100%" }}>
+                <img src={image} style={{ height: 100, width: 100, borderRadius: "5%", margin: 'auto' }} alt="" />
             </div>
         </Box>
     </>

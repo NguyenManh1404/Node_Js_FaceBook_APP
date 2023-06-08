@@ -5,6 +5,17 @@ import { useRecords, useNotice } from 'admin-bro';
 import { useHistory } from 'react-router-dom';
 
 const RecipeStatus = (props) => {
+    function makeid(length) {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            counter += 1;
+        }
+        return result;
+    }
     const sendNotice = useNotice()
     const history = useHistory()
     const {
@@ -13,10 +24,10 @@ const RecipeStatus = (props) => {
         page,
         total,
         perPage, } = useRecords(props?.resource?.id);
-    const status = props?.record?.params?.statusPost
+    const status = props?.record?.params?.status
     const onUpdate = async () => {
         try {
-            await axios.put('/api/post/approve/' + props?.record?.params?._id);
+            await axios.put('/api/recipe/approve/' + props?.record?.params?._id);
             const search = new URLSearchParams()
             search.set('direction', direction);
             if (sortBy)
@@ -24,6 +35,7 @@ const RecipeStatus = (props) => {
             search.set('page', String(page));
             search.set('total', String(total));
             search.set('perPage', String(perPage));
+            search.set('random', makeid(6));
             history.push({ search: search.toString() })
             sendNotice({ message: 'Duyệt bài viết thành công', type: 'success' })
         } catch (error) {

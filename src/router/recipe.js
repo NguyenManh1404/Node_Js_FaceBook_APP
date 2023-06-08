@@ -15,5 +15,5 @@ router.get("/get-recipe-current-user", verifyAccessToken, RecipeController.getLi
 router.put("/:id", verifyAccessToken, RecipeController.edit)
 router.delete("/:id", verifyAccessToken, RecipeController.delete)
 router.get("/detail/:id", verifyAccessToken, RecipeController.getRecipeById);
-
+router.put("/approve/:id", RecipeController.approve);
 module.exports = router;
