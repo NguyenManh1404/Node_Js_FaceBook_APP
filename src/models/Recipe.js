@@ -11,6 +11,7 @@ let schema = new mongoose.Schema(
         required: true,
       },
     ],
+    //get
     categories: [
       {
         type: String,
@@ -35,7 +36,7 @@ let schema = new mongoose.Schema(
       type: Boolean,
       required: true,
       default: false,
-    }
+    },
   },
   {
     timestamps: true,
