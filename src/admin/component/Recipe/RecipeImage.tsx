@@ -8,7 +8,7 @@ const RecipeImage = (props) => {
     return (<>
         <Box>
             <div style={{ width: "100%" }}>
-                <img src={image} style={{ height: 100, width: 100, borderRadius: "5%", margin: 'auto' }} alt="" />
+                <img src={`/public/${image}`} style={{ height: 100, width: 100, borderRadius: "5%", margin: 'auto' }} alt="" />
             </div>
         </Box>
     </>

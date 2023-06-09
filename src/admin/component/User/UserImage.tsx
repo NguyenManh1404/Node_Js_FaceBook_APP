@@ -5,7 +5,7 @@ const UserImage = (props) => {
     return (<>
         <Box>
             <div style={{ width: "100%" }}>
-                <img src={props?.record?.params?.avatar} style={{ height: 100, width: 100, borderRadius: "50%", margin: 'auto' }} alt="" />
+                <img src={`/public/${props?.record?.params?.avatar}`}  style={{ height: 100, width: 100, borderRadius: "50%", margin: 'auto' }} alt="" />
             </div>
         </Box>
     </>
