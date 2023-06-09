@@ -3,7 +3,7 @@ const User = require("../../models/User");
 const Favorite = require("../../models/Favorite");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const RecipeController = {
   // [POST] /api/recipe/create
@@ -188,7 +188,8 @@ const RecipeController = {
       console.log(decodedToken);
       const userId = decodedToken.id;
 
-      const recipes = await Recipe.find().sort({ updatedAt: -1 }).limit(10);
+      const recipes = await Recipe.find().sort({ updatedAt: -1 });
+      // const recipes = await Recipe.find().sort({ updatedAt: -1 }).limit(10);
       // Sử dụng .lean() để chuyển đổi kết quả từ Object Mongoose thành JavaScript object; // Thêm phương thức .limit(10) để giới hạn kết quả trả về là 10
 
       // Lấy danh sách userId của người tạo trong các công thức
@@ -301,9 +302,11 @@ const RecipeController = {
         },
       ]);
 
-      console.log(topRecipes)
+      console.log(topRecipes);
 
-      const recipeIds = topRecipes.map(recipe => mongoose.Types.ObjectId(recipe._id));
+      const recipeIds = topRecipes.map((recipe) =>
+        mongoose.Types.ObjectId(recipe._id)
+      );
 
       // Find the favorites for the user and the recipeIds
       const favorites = await Favorite.find({
@@ -312,15 +315,16 @@ const RecipeController = {
       });
 
       // Create a Set of favorited recipeIds for faster lookup
-      const favoritedRecipeIds = new Set(favorites.map(favorite => favorite.recipeId.toString()));
+      const favoritedRecipeIds = new Set(
+        favorites.map((favorite) => favorite.recipeId.toString())
+      );
 
       // Update the isFavorited field for each recipe in topRecipes
-      const updatedTopRecipes = topRecipes.map(recipe => {
+      const updatedTopRecipes = topRecipes.map((recipe) => {
         recipe.isFavorited = favoritedRecipeIds.has(recipe._id.toString());
         return recipe;
       });
       res.status(200).json({ msg: "get post list success", updatedTopRecipes });
-
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error.message }] });
     }
@@ -344,15 +348,17 @@ const RecipeController = {
 
       const checkFavorite = await Favorite.find({
         userId: decodedToken.id,
-        recipeId: recipeId
-      })
+        recipeId: recipeId,
+      });
 
       if (checkFavorite.length > 0) {
-        favorite = true
+        favorite = true;
       }
 
       return res.status(200).json({
-        "msg": "Get recipe successfully", recipe, isFavorite: favorite
+        msg: "Get recipe successfully",
+        recipe,
+        isFavorite: favorite,
       });
     } catch (err) {
       console.error(err);
@@ -366,17 +372,25 @@ const RecipeController = {
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     const isUser = decodedToken.id;
 
-    const { name, linkVideo, images, categories, cookTime, ingredients, steps } = req.body
+    const {
+      name,
+      linkVideo,
+      images,
+      categories,
+      cookTime,
+      ingredients,
+      steps,
+    } = req.body;
 
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
     try {
-
       const user = await User.findById(isUser);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      const id = req.params.id
+      const id = req.params.id;
       if (!id) {
         return res.status(404).json({ error: "Receipe not found" });
       }
@@ -389,11 +403,10 @@ const RecipeController = {
         ingredients: ingredients,
         steps: steps,
         author: isUser,
-      })
-      await recipe.save()
+      });
+      await recipe.save();
 
-      res.status(200).json({ msg: 'Edit was recipe successfully' });
-
+      res.status(200).json({ msg: "Edit was recipe successfully" });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
     }
@@ -405,28 +418,27 @@ const RecipeController = {
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     const isUser = decodedToken.id;
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
     try {
-
       const user = await User.findById(isUser);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      const id = req.params.id
+      const id = req.params.id;
 
       if (!id) {
         return res.status(404).json({ error: "Receipe not found" });
       }
 
-      const recipe = await Recipe.findById(id)
+      const recipe = await Recipe.findById(id);
 
       if (!recipe) {
         return res.status(404).json({ error: "Receipe not found" });
       }
 
-      await recipe.remove()
-      res.status(200).json({ msg: 'Delete was recipe successfully' });
-
+      await recipe.remove();
+      res.status(200).json({ msg: "Delete was recipe successfully" });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
     }
@@ -435,18 +447,18 @@ const RecipeController = {
   // [GET] /api/post
   async list(req, res) {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
 
-    const options = {}
+    const options = {};
     if (req.query.name) {
       options.name = {
-        $regex: '.*' + req.query.name + '.*'
-      }
+        $regex: ".*" + req.query.name + ".*",
+      };
     }
     try {
-      const data = await Recipe.find(options).sort({ createdAt: 'descending' })
-      res.status(200).json({ msg: 'get recipe list success', data });
-
+      const data = await Recipe.find(options).sort({ createdAt: "descending" });
+      res.status(200).json({ msg: "get recipe list success", data });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
     }
@@ -462,21 +474,21 @@ const RecipeController = {
       return res.status(404).json({ error: "User not found" });
     }
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
 
-    const options = {}
+    const options = {};
     if (req.query.name) {
       options.name = {
-        $regex: '.*' + req.query.name + '.*'
-      }
+        $regex: ".*" + req.query.name + ".*",
+      };
     }
 
     options.author = idUser;
 
     try {
-      const data = await Recipe.find(options).sort({ createdAt: 'descending' })
-      res.status(200).json({ msg: 'get recipe list success', data });
-
+      const data = await Recipe.find(options).sort({ createdAt: "descending" });
+      res.status(200).json({ msg: "get recipe list success", data });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
     }
@@ -491,20 +503,18 @@ const RecipeController = {
     // const errors = validationResult(req);
     // if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
     try {
-      const id = req.params.id
+      const id = req.params.id;
       const recipe = await Recipe.findByIdAndUpdate(id, {
-        status: true
-      })
-      await recipe.save()
+        status: true,
+      });
+      await recipe.save();
 
-      res.status(200).json({ msg: 'recipe was approved successfully' });
-
+      res.status(200).json({ msg: "recipe was approved successfully" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ errors: [{ msg: error }] });
     }
   },
-
 };
 
 module.exports = RecipeController;
