@@ -24,4 +24,5 @@ router.get("/otherTrending", RecipeController.otherTrendingNow);
 router.get("/otherRencentRecipe", RecipeController.otherRencentRecipe);
 router.get("/otherPopularCreate", RecipeController.otherPopularCreate);
 router.get("/otherPopularCategory", RecipeController.otherPopularCategory);
+//get
 module.exports = router;
