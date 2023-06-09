@@ -157,7 +157,7 @@ const AuthController = {
       // Compare hased password with user password to see if they are valid
       const isMatch = await bcrypt.compareSync(password, user.password);
 
-      if (isMatch) {
+      if (user) {
         return user
       }
       return null
