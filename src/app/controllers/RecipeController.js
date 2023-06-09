@@ -4,6 +4,7 @@ const Favorite = require("../../models/Favorite");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const { response } = require("express");
 
 const RecipeController = {
   // [POST] /api/recipe/create
@@ -175,7 +176,17 @@ const RecipeController = {
       return res.status(500).json({ errors: [{ msg: error }] });
     }
   },
-
+  async otherRecentRecipe(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    try {
+      const data = await Recipe.find({}).sort({ createdAt: "descending" });
+      res.status(200).json({ message: "get sucessfully", data });
+    } catch (error) {
+      return res.status(500).json({ errors: [{ message: error }], data });
+    }
+  },
   //[GET] /api/recipe/recent
   async getRecentRecipe(req, res) {
     const errors = validationResult(req);
@@ -228,7 +239,66 @@ const RecipeController = {
       return res.status(500).json({ errors: [{ msg: error }] });
     }
   },
+  //[GET] /api/recipe/otherTrendingNow
+  async otherTrendingNow(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    try {
+      const data = await Recipe.find({})
+        .sort({ createdAt: "descending" })
+        .limit(10);
 
+      res.status(200).json({ message: "get sucessfully", data });
+    } catch (error) {
+      return res.status(500).json({ errors: [{ message: error }], data });
+    }
+  },
+  //[GET] /api/recipe/otherRencentRecipe
+  async otherRencentRecipe(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    try {
+      const data = await Recipe.find({})
+        .sort({ createdAt: "descending" })
+        .limit(10);
+
+      res.status(200).json({ message: "get sucessfully", data });
+    } catch (error) {
+      return res.status(500).json({ errors: [{ message: error }], data });
+    }
+  },
+  //[GET] /api/recipe/otherPopularCategory
+  async otherPopularCategory(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    try {
+      const data = await Recipe.find({})
+        .sort({ createdAt: "descending" })
+        .limit(10);
+
+      res.status(200).json({ message: "get sucessfully", data });
+    } catch (error) {
+      return res.status(500).json({ errors: [{ message: error }], data });
+    }
+  },
+  //[GET] /api/recipe/otherPopularCreate
+  async otherPopularCreate(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+    try {
+      const data = await User.find({})
+        .sort({ createdAt: "descending" })
+        .limit(10);
+
+      res.status(200).json({ message: "get sucessfully", data });
+    } catch (error) {
+      return res.status(500).json({ errors: [{ message: error }], data });
+    }
+  },
   //[GET] /api/recipe/trending
   async trendingNow(req, res) {
     const errors = validationResult(req);
