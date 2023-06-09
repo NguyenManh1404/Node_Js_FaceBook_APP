@@ -1,14 +1,13 @@
 const authRouter = require("./auth");
 
-
 const postRouter = require("./post");
 const userRouter = require("./user");
 const notificationRouter = require("./notification");
 const recipeRouter = require("./recipe");
 const favoriteRouter = require("./favorite");
-const followerRouter = require('./follower')
-const commentRouter = require('./comment')
-const installRouter = require('./install')
+const followerRouter = require("./follower");
+const commentRouter = require("./comment");
+const installRouter = require("./install");
 
 const routes = (app) => {
   app.use("/api/auth", authRouter);
