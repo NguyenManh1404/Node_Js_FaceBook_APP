@@ -299,6 +299,7 @@ const RecipeController = {
       return res.status(500).json({ errors: [{ message: error }], data });
     }
   },
+  //get
   //[GET] /api/recipe/trending
   async trendingNow(req, res) {
     const errors = validationResult(req);
