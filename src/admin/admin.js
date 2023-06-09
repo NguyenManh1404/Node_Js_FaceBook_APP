@@ -14,16 +14,16 @@ const resources = [
   UserResource,
   PostResource,
   {
-    resource: Recipe,
+    resource: Category,
     options: {
       parent: {
-        name: 'Post Managerment',
+        name: 'Category Managerment',
         icon: 'Image',
       },
       toolbar: DefaultQuillToolbarOptions,
     }
   },
-  Category]
+]
 
 const pages =
 {
