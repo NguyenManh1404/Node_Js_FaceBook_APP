@@ -2,7 +2,7 @@ const User = require("../../models/User");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const Follower = require("../../models/Follower");
-
+const Recipe = require("../../models/Recipe");
 const UserController = {
   // [GET] /api/user
   async list(req, res) {
@@ -36,6 +36,36 @@ const UserController = {
       res.status(200).json({ msg: "get user list success", data });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
+    }
+  },
+  //[GET] api/otheruser
+  async getDetailUserOther(req, res) {
+    const id = req.params.id;
+
+    const data = await User.findById(id);
+
+    const recipes = await Recipe.find({
+      author: id,
+    });
+
+    const follows = await Follower.find({
+      idUser: id,
+    });
+
+    const following = await Follower.find({
+      idUserFollower: id,
+    });
+
+    if (data) {
+      res.status(200).json({
+        msg: "get user",
+        data,
+        count_reciepes: recipes.length,
+        follow: follows.length,
+        following: following.length,
+      });
+    } else {
+      res.status(200).json({ msg: "user not found" });
     }
   },
 
@@ -100,8 +130,8 @@ const UserController = {
 
     const checkFollower = await Follower.find({
       idUser: idUser,
-      idUserFollower: id
-    })
+      idUserFollower: id,
+    });
 
     if (checkFollower.length > 0) {
       follower = true;

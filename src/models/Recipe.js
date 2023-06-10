@@ -37,6 +37,10 @@ let schema = new mongoose.Schema(
       required: true,
       default: false,
     },
+    commentsPost: {
+      type: Number,
+      min: 0,
+    },
   },
   {
     timestamps: true,
