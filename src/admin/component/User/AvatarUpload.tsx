@@ -61,7 +61,7 @@ const AvatarUpload = (props) => {
     return (
         <div>
             <div style={{ width: "100%" }}>
-                <img src={`/public/${image}`} style={{ height: 100, margin: 'auto' }} alt="" />
+                <img src={`${image?.replace('\\public','/public')}`} style={{ height: 100, margin: 'auto' }} alt="" />
             </div>
             <div {...getRootProps()}>
                 <input {...getInputProps()} accept="image/*" />
