@@ -18,7 +18,7 @@ const CommentController = {
 
     try {
       const data = await Comment.find({
-        recipeId: body.recipeId,
+        recipeId: req.body.recipeId,
       })
         .populate("user")
         .sort({ createdAt: "descending" });
