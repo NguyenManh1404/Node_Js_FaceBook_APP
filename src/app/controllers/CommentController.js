@@ -18,8 +18,10 @@ const CommentController = {
 
     try {
       const data = await Comment.find({
-        idUser: decodedToken.id,
-      }).sort({ createdAt: "descending" });
+        recipeId: body.recipeId,
+      })
+        .populate("user")
+        .sort({ createdAt: "descending" });
       res.status(200).json({ msg: "get comment list success", data });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
