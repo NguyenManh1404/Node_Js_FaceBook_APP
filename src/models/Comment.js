@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 let schema = new mongoose.Schema(
   {
@@ -7,16 +7,18 @@ let schema = new mongoose.Schema(
       ref: "user",
       required: true,
     },
-    idPost: {
+    recipeId: {
       type: Schema.Types.ObjectId,
-      ref: "post",
+      ref: "recipe",
       required: true,
     },
     content: {
       type: String,
       required: true,
-    }
-  }, {
-  timestamps: true
-})
-module.exports = mongoose.model('comment', schema);
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+module.exports = mongoose.model("comment", schema);

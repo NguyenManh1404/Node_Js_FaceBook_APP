@@ -4,6 +4,7 @@ const Follower = require("../../models/Follower");
 const User = require("../../models/User");
 const Comment = require("../../models/Comment");
 const Post = require("../../models/Post");
+const Recipe = require("../../models/Recipe");
 
 const CommentController = {
   // [GET] /api/comment
@@ -36,21 +37,21 @@ const CommentController = {
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
     try {
-      const { idPost, content } = req.body;
+      const { recipeId, content } = req.body;
 
       const user = await User.findById(idUser);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
 
-      const post = await Post.findById(idPost);
-      if (!post) {
+      const recipe = await Recipe.findById(recipeId);
+      if (!recipe) {
         return res.status(404).json({ error: "Post not found" });
       }
 
       const newComment = await new Comment({
         idUser: idUser,
-        idPost: idPost,
+        recipeId: recipeId,
         content: content,
       });
       await newComment.save();
