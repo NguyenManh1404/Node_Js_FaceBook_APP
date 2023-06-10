@@ -61,6 +61,8 @@ const UserController = {
         msg: "get user",
         data,
         count_reciepes: recipes.length,
+        reciepes: recipes,
+
         follow: follows.length,
         following: following.length,
       });
