@@ -19,7 +19,9 @@ const CommentController = {
     try {
       const data = await Comment.find({
         recipeId: body.recipeId,
-      }).sort({ createdAt: "descending" });
+      })
+        .populate("user")
+        .sort({ createdAt: "descending" });
       res.status(200).json({ msg: "get comment list success", data });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
