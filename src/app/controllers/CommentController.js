@@ -15,13 +15,11 @@ const CommentController = {
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
-
+    console.log(req.body.recipeId);
     try {
       const data = await Comment.find({
         recipeId: req.body.recipeId,
-      })
-        .populate("user")
-        .sort({ createdAt: "descending" });
+      }).populate("idUser");
       res.status(200).json({ msg: "get comment list success", data });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });
