@@ -4,7 +4,7 @@ const CommentController = require("../app/controllers/CommentController"); //imp
 const { verifyAccessToken } = require("../app/middleware/authentication");
 const validator = require("../validation/comment"); //import validator
 
-router.get("/", verifyAccessToken, CommentController.list);
+router.get("/:id", verifyAccessToken, CommentController.list);
 router.post("/addComment", verifyAccessToken, CommentController.addComment);
 router.delete("/:id", verifyAccessToken, CommentController.deleteComment);
 
