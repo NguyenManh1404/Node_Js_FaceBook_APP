@@ -382,3 +382,6 @@ app.listen(PORT, () => {
 
 1. brew install --cask ngrok
 2. ngrok http 3001  
+
+## Export Database
+  mongodump --uri mongodb+srv://nguyennmanh:@cluster0.zn0c87t.mongodb.net/meal_master_app --out ~/Desktop/exported_data.json
