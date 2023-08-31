@@ -46,6 +46,20 @@ const verifyEmail = [
   }),
 ];
 
+const resetPassword = [
+  check("email", "Email is required").notEmpty(),
+  check("email", "Invalid email.").isEmail(),
+  check("password", "Password is required").notEmpty(),
+  check("password", "Password must be at least 6 characters").isLength({
+    min: 6,
+  }),
+  check("confirmPassword", "Confirm password is required").notEmpty(),
+  check(
+    "confirmPassword",
+    "Confirm password must be at least 6 characters"
+  ).isLength({ min: 6 }),
+];
+
 //{
 //     "firstName": "firstName",
 //     "lastName": "lastName",
@@ -56,6 +70,6 @@ const verifyEmail = [
 
 // }
 
-const validator = { register, login, verifyEmail };
+const validator = { register, login, verifyEmail, resetPassword };
 
 module.exports = validator;

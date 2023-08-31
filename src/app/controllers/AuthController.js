@@ -117,7 +117,7 @@ const AuthController = {
       return res.status(400).json({ errors: errors.array() });
     }
     try {
-      const { email, emailVerificationCode } = req?.body;
+      const { email, emailVerificationCode, isFromForgotPassword } = req?.body;
 
       const user = await User.findOne({
         email: email,
@@ -129,13 +129,18 @@ const AuthController = {
           isEmailVerified: true,
         });
 
-        return res
-          .status(200)
-          .json({ data: user, message: "Verify account successfully" });
+        return res.status(200).json({
+          data: { user: user, isFromForgotPassword: isFromForgotPassword || false},
+          message: "Verify account successfully",
+        });
       } else {
         return res
-          .status(200)
-          .json({ message: "Mail verification code or Email is not match" });
+          .status(401)
+          .json({
+            errors: [
+              { message: "Mail verification code or Email is not match" },
+            ],
+          });
       }
     } catch (error) {
       return res
@@ -143,7 +148,6 @@ const AuthController = {
         .json({ errors: [{ message: "Internal server error", error }] });
     }
   },
-
 
   async checkUserMatch(email, password) {
     try {
@@ -158,12 +162,12 @@ const AuthController = {
       const isMatch = await bcrypt.compareSync(password, user.password);
 
       if (user) {
-        return user
+        return user;
       }
-      return null
+      return null;
     } catch (error) {
       console.log(error);
-      return null
+      return null;
     }
   },
 
@@ -187,9 +191,7 @@ const AuthController = {
       }
 
       if (user.status === false) {
-        return res
-          .status(400)
-          .json({ errors: [{ message: "User is block" }] });
+        return res.status(400).json({ errors: [{ message: "User is block" }] });
       }
 
       // Compare hased password with user password to see if they are valid
@@ -221,37 +223,116 @@ const AuthController = {
       );
 
       let installation = {};
-      let device = {}
+      let device = {};
       // let checkExistDevice = {}
       const checkExistDevice = await Installation.find({
         userID: user.id,
-        tokenDevice: req.body?.tokenDevice
+        tokenDevice: req.body?.tokenDevice,
       });
 
       if (checkExistDevice.length == 0) {
         installation = await new Installation({
           userID: user.id,
-          tokenDevice: req.body?.tokenDevice
+          tokenDevice: req.body?.tokenDevice,
         });
 
         await installation.save();
-        device = installation
+        device = installation;
       }
-
 
       if (checkExistDevice.length > 0) {
         checkExistDevice.map((value) => {
           device = value;
-        })
+        });
       }
 
       return res.json({
         user,
         accessToken,
         refreshToken,
-        device
+        device,
       });
     } catch (error) {
+      return res
+        .status(500)
+        .json({ errors: [{ message: "Internal server error" }] });
+    }
+  },
+
+  // [POST] /api/auth/requestCodeVerifyEmail
+  async requestCodeVerifyEmail(req, res) {
+    const { email } = req.body;
+
+    try {
+      const user = await User.findOne({ email });
+
+      // User not found
+      if (!user)
+        return res
+          .status(400)
+          .json({ errors: [{ msg: "User not registered" }] });
+
+      const mailOptions = {
+        from: "MasterMeal Team",
+        to: email,
+        subject: "MasterMeal - Verify email",
+        template: "verify-email",
+        context: {
+          firstName: user?.firstName,
+          emailVerificationCode: user?.emailVerificationCode,
+        },
+      };
+
+      await transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.error(error.message);
+          return res
+            .status(500)
+            .json({ errors: [{ message: "Internal server error" }] });
+        } else {
+          return res.json({
+            message: `We have sent a verify email link to ${email}`,
+            email: email
+          });
+        }
+      });
+    } catch (error) {
+      console.error(error.message);
+      return res
+        .status(500)
+        .json({ errors: [{ message: "Internal server error" }] });
+    }
+  },
+
+  // [POST] /api/auth/reset-password
+  async resetPassword(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
+
+    const { password, confirmPassword, email } = req.body;
+
+    if (password !== confirmPassword)
+      return res
+        .status(400)
+        .json({ errors: [{ message: "Confirm password not match" }] });
+
+    try {
+      // Hash password before saving to database
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      const user = await User.findOne({ email });
+      // User not found
+      if (!user)
+        return res
+          .status(400)
+          .json({ errors: [{ message: "User not found" }] });
+
+      await User.findByIdAndUpdate(user?.id, { password: hashedPassword });
+
+      return res.json({ message: "Password was reset successfully", data: user });
+    } catch (error) {
+      console.error(error.message);
       return res
         .status(500)
         .json({ errors: [{ message: "Internal server error" }] });
@@ -266,7 +347,6 @@ const AuthController = {
 
   // }
   // },
-
 
   async getAuth(req, res) {
     // passport.authenticate('EAAHdkS0ZBDKEBAMvbpMLIAuRfefTge5PdHVZChAh5GNZAwLEcoETnOfD7smJERePZANWHNwJznqoB6RBqsD9cM69cbe5lIzJIPAe8Q8EAEfrAQTArZB3TpNHYrAocx2gOaoge30IV9XHUirToh5uEqeTZBWgedGdTJks3pyBPzHkuhLdGwYC9fEqNPf3VLgKsXWJsZCdZCLkF2YBwU5N7zQlhCPnZCh52xseYZCMtu4cEL0eltkuPn0lta', (error, user, info) => {

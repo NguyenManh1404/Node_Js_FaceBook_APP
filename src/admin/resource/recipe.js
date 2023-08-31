@@ -8,7 +8,7 @@ const PostResource = {
         listProperties: ['name', 'linkVideo', 'images', 'cookTime', 'author', 'status'],
         parent: {
             name: 'Post Managerment',
-            icon: 'Image',
+            icon: 'Product',
         },
         toolbar: DefaultQuillToolbarOptions,
         properties: {
