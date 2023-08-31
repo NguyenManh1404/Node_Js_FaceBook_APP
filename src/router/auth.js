@@ -1,4 +1,4 @@
-const express = require('express'); //impo
+const express = require('express'); //import
 const router = express.Router(); //import
 
 // const PostController = require('../app/controllers/PostController')
