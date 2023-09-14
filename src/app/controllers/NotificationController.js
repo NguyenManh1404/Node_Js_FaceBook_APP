@@ -26,7 +26,7 @@ const NotificationController = {
        },
      },
      token:
-       "cSJT3GsCRqWyjLiebThXPD:APA91bGandG4ZfWSqGRVLU5Qade35L_EfDA-E5re8n5xtc6YwQnIK67mIgE7qAGXocsyj3V9WWYjugkEZjjN-W_d9lXBc53Fn0Qn3DyAuE4IOykzU8AdX6Fr3XjKfyFhU4QabxkKXops",
+       "dxZAB27HTy2xWgFaQimi20:APA91bFszVLbuyROGeLdPvv27O3pR4-wR7URtJLRDYiIej_VYyMbG827TOmf-AjF_H_tR1RYcyJRu5H21qPsKrk9EkDtCVQss-LljIuFvaNgeBN7F9zK8jUrk11zPX6j5oWMclnVh0wL",
    };
 
    admin
@@ -46,8 +46,8 @@ const NotificationController = {
 
     const follower = {
       title: "You are new follow",
-      name: req.body.name,
-      name_follower: req.body.name_follower
+      // name: req.body.name,
+      // name_follower: req.body.name_follower
     }
 
     const message = {
