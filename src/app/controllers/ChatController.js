@@ -2,6 +2,8 @@ const Chat = require("../../models/Chat");
 const User = require("../../models/User");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const Installation = require("../../models/Installation");
+const admin = require("../../../config/pushnotification");
 
 const ChatController = {
   //[POST] /api/chat/add_new_message
@@ -12,36 +14,82 @@ const ChatController = {
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     try {
-
-
       const { idUserReceive, content, images } = req.body;
-
 
       const existingChat = await Chat.findOne({
         membersId: { $all: [idUserReceive, decodedToken?.id] },
       });
 
-
-
-
       if (existingChat) {
-      // Nếu cuộc trò chuyện đã tồn tại, thêm tin nhắn vào cuộc trò chuyện đó
-      existingChat.messages.push({
-        senderId: decodedToken?.id,
-        content: content,
-        images: images,
-      });
-      await existingChat.save();
-    } else {
+        // Nếu cuộc trò chuyện đã tồn tại, thêm tin nhắn vào cuộc trò chuyện đó
+        existingChat.messages.push({
+          senderId: decodedToken?.id,
+          content: content,
+          images: images,
+        });
 
-      const newChat = await new Chat({ 
-        membersId: [idUserReceive, decodedToken?.id],
-        messages: [
-          { senderId: decodedToken?.id, content: content, images: images },
-        ],
-      });
-      await newChat.save();
-    }
+        await existingChat.save();
+      } else {
+        const newChat = await new Chat({
+          membersId: [idUserReceive, decodedToken?.id],
+          messages: [
+            { senderId: decodedToken?.id, content: content, images: images },
+          ],
+        });
+        await newChat.save();
+      }
+
+
+     
+
+      const user = await User.findById(decodedToken?.id);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+       const userFollower = await User.findById(idUserReceive);
+      if (!userFollower) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const tokens = await Installation.find({ userID: idUserReceive }).select(
+        "tokenDevice"
+      );
+
+      const tokenDevices = tokens.map((item) => item.tokenDevice);
+
+      /// Get Notification
+
+      const message = {
+        notification: {
+          title: `${user?.firstName} send to  ${user?.firstName} a message `,
+          body: `You have a message from ${user?.firstName}. Please check`,
+          imageUrl: "https://foo.bar.pizza-monster.png",
+        },
+        android: {
+          notification: {
+            sound: "default",
+            imageUrl: "https://foo.bar.pizza-monster.png",
+          },
+        },
+        webpush: {
+          headers: {
+            image: "https://foo.bar.pizza-monster.png",
+          },
+        },
+        tokens: tokenDevices,
+      };
+
+      await admin
+        .messaging()
+        .sendEachForMulticast(message)
+        .then((response) => {
+          console.log("Message sent successfully:", response);
+        })
+        .catch((error) => {
+          console.log("Error sending message:", error);
+        });
+
       res.status(200).json({ msg: "A Chat was created successfully" });
     } catch (error) {
          console.error(error.message);
