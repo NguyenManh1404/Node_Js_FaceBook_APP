@@ -7,6 +7,7 @@ const recipeRouter = require("./recipe");
 const favoriteRouter = require("./favorite");
 const followerRouter = require("./follower");
 const commentRouter = require("./comment");
+const chatRouter = require("./chat");
 const installRouter = require("./install");
 
 const routes = (app) => {
@@ -19,6 +20,7 @@ const routes = (app) => {
   app.use("/api/follower", followerRouter);
   app.use("/api/comment", commentRouter);
   app.use("/api/install", installRouter);
+  app.use("/api/chat", chatRouter);
 };
 
 module.exports = routes;
