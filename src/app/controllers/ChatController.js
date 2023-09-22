@@ -30,6 +30,7 @@ const ChatController = {
 
         await existingChat.save();
       } else {
+        // Nếu chưa có thì tạo mới
         const newChat = await new Chat({
           membersId: [idUserReceive, decodedToken?.id],
           messages: [
@@ -39,31 +40,29 @@ const ChatController = {
         await newChat.save();
       }
 
-
-     
-
+      //Lấy thông tin user
       const user = await User.findById(decodedToken?.id);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-
-       const userFollower = await User.findById(idUserReceive);
+      //Lấy thông tin user người nhận
+      const userFollower = await User.findById(idUserReceive);
       if (!userFollower) {
         return res.status(404).json({ error: "User not found" });
       }
 
+      //Lây tokenMessage theo nhung devices mà user đã đăng nhập
       const tokens = await Installation.find({ userID: idUserReceive }).select(
         "tokenDevice"
       );
-
+      //format lại
       const tokenDevices = tokens.map((item) => item.tokenDevice);
 
       /// Get Notification
-
       const message = {
         notification: {
-          title: `${user?.firstName} send to  ${user?.firstName} a message `,
-          body: `You have a message from ${user?.firstName}. Please check`,
+          title: `${user?.firstName} send to  ${userFollower?.firstName} a message `,
+          body: `You have a message from ${user?.firstName}. Please check your message`,
           imageUrl: "https://foo.bar.pizza-monster.png",
         },
         android: {
@@ -77,7 +76,7 @@ const ChatController = {
             image: "https://foo.bar.pizza-monster.png",
           },
         },
-        tokens: tokenDevices,
+        tokens: tokenDevices, // truyền mảng tokens
       };
 
       await admin
@@ -90,53 +89,87 @@ const ChatController = {
           console.log("Error sending message:", error);
         });
 
+      //return response
       res.status(200).json({ msg: "A Chat was created successfully" });
     } catch (error) {
-         console.error(error.message);
-         return res
-           .status(500)
-           .json({ errors: [{ message: "Internal server error", error }] });
-     
+      console.error(error.message);
+      return res
+        .status(500)
+        .json({ errors: [{ message: "Internal server error", error }] });
     }
   },
 
-//[GET] /api/chat/get_chat_with_userId/:idUserReceive
-  async getChatWithId(req,res){
-
+  //[GET] /api/chat/get_chat_with_userId/:idUserReceive
+  async getChatWithId(req, res) {
     const { idUserReceive } = req.params;
     const authHeader = req.get("Authorization");
     const token = authHeader.split(" ")[1];
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-try {
+    try {
+      const user = await User.findById(decodedToken?.id);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
 
+      const existingChat = await Chat.findOne({
+        membersId: { $all: [idUserReceive, decodedToken?.id] },
+      });
 
-    const user = await User.findById(decodedToken?.id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      //res
+      return res
+        .status(200)
+        .json({ data: existingChat, message: "Get list successfully" });
+    } catch (error) {
+      console.error(error.message);
+      return res
+        .status(500)
+        .json({ errors: [{ message: "Internal server error", error }] });
     }
-
-    // const chats = await Chat.find({
-    //   membersId: [decodedToken?.id, idUserReceive],
-    // });
-
-    const existingChat = await Chat.findOne({
-      membersId: { $all: [idUserReceive, decodedToken?.id] },
-    });
-
-   
-  //res
-  return res
-    .status(200)
-    .json({ data: existingChat, message: "Get list successfully" });
-} catch (error) {
-     console.error(error.message);
-     return res
-       .status(500)
-       .json({ errors: [{ message: "Internal server error", error }] });
-}
   },
 
+  //[GET] api/chat/get_all_list_chat
+
+  async getAllListChat(req, res) {
+    try {
+      const authHeader = req.get("Authorization");
+      const token = authHeader.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+      const chats = await Chat.find({
+        membersId: decodedToken.id,
+      });
+      //dùng promise để chống bất đồng bộ
+      const formatChat = await Promise.all(
+        chats?.map(async (chat) => {
+          const otherIds = chat.membersId;
+          const messages = chat.messages;
+          const otherId = otherIds.filter(
+            (id) => id.toString() !== decodedToken.id.toString()
+          );
+
+          const user = await User.findById(otherId[0]);
+
+          return {
+            idUserReceive: user?._id,
+            otherUserFullName: user?.lastName + " " + user?.firstName,
+            otherUserAvatar: user?.avatar,
+            lastMessage: messages[messages.length - 1],
+            timeCreate: chat?.updatedAt,
+          };
+        })
+      );
+      //res
+      return res
+        .status(200)
+        .json({ data: formatChat, message: "Get list successfully" });
+    } catch (error) {
+          console.error(error.message);
+          return res
+            .status(500)
+            .json({ errors: [{ message: "Internal server error", error }] });
+    }
+  },
 
   //[GET] api/notification/pushNotification
   async getNotification(req, res) {

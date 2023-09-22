@@ -8,6 +8,8 @@ router.get(
   "/get_chat_with_userId/:idUserReceive",
   ChatController.getChatWithId
 );
+
+router.get("/get_all_list_chat", ChatController.getAllListChat);
 // router.get("/trending-now", PostController.trendingNow);
 // router.get("/:id", verifyAccessToken, PostController.detail);
 router.post(
