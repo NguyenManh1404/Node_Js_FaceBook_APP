@@ -8,6 +8,11 @@ const UserController = {
   async list(req, res) {
     const errors = validationResult(req);
 
+     const authHeader = req.get("Authorization");
+
+     const token = authHeader.split(" ")[1];
+     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
 
@@ -28,6 +33,12 @@ const UserController = {
     if (req.query.email) {
       options.email = {
         $regex: ".*" + req.query.email + ".*",
+      };
+    }
+
+    if (decodedToken?.id) {
+      options._id = {
+        $ne: decodedToken?.id,
       };
     }
 
@@ -72,12 +83,24 @@ const UserController = {
   },
 
   // [GET] /api/popular-creator
+
+
   async popularCreator(req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return res.status(400).json({ errors: errors.array() });
+    
     try {
+
+        const authHeader = req.get("Authorization");
+
+        const token = authHeader.split(" ")[1];
+        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+
       const data = await User.aggregate([
+        {
+          $match: {
+            _id: { $ne: decodedToken?.id }, // Exclude your user by ID
+          },
+        },
         {
           $lookup: {
             from: "post",
@@ -147,6 +170,9 @@ const UserController = {
       res.status(200).json({ msg: "user not found" });
     }
   },
+
+
+
 
   // Upload endpoint
   upload(req, res) {
