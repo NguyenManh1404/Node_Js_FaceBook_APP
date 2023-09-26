@@ -171,17 +171,30 @@ const UserController = {
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    
-    try {
-      const { firstName, lastName, avatar, phoneNumber } = req.body;
-      await User.findByIdAndUpdate(idUser, {
-        firstName,
-        lastName,
-        avatar,
-        phoneNumber,
-      });
 
-      return res.status(200).json({ msg: "Update user successfully" });
+    try {
+      // Tìm người dùng trong cơ sở dữ liệu
+      const user = await User.findOne({ _id: idUser });
+
+      if (!user) {
+        return res.status(404).json({ errors: [{ msg: "User not found" }] });
+      }
+
+      // Cập nhật thông tin của người dùng
+      const { firstName, lastName, avatar, phoneNumber } = req.body;
+
+      user.firstName = firstName;
+      user.lastName = lastName;
+      user.avatar = avatar;
+      user.phoneNumber = phoneNumber;
+
+      // Lưu thông tin đã cập nhật vào cơ sở dữ liệu
+      await user.save();
+
+      return res.json({
+        message: "Update user successfully",
+        data: user,
+      });
     } catch (error) {
       console.error(error.message);
       return res
