@@ -60,6 +60,23 @@ const resetPassword = [
   ).isLength({ min: 6 }),
 ];
 
+
+const updateAccount = [
+  check("firstName", "First Name user is required.").notEmpty(),
+  check("firstName", "First name must be at least 2 characters").isLength({
+    min: 2,
+  }),
+  check("lastName", "Last name is required").notEmpty(),
+  check("lastName", "Last name must be at least 2 characters").isLength({
+    min: 2,
+  }),
+  check("phoneNumber", "Invalid mobile number.").notEmpty(),
+  check("phoneNumber", "Invalid mobile number.").isLength({ min: 10, max: 11 }),
+  check("phoneNumber", "Invalid mobile number").matches(
+    /(84|0[3|5|7|8|9])+([0-9]{8})\b/
+  ),
+];
+
 //{
 //     "firstName": "firstName",
 //     "lastName": "lastName",
@@ -70,6 +87,12 @@ const resetPassword = [
 
 // }
 
-const validator = { register, login, verifyEmail, resetPassword };
+const validator = {
+  register,
+  login,
+  verifyEmail,
+  resetPassword,
+  updateAccount,
+};
 
 module.exports = validator;

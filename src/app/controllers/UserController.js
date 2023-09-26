@@ -8,10 +8,10 @@ const UserController = {
   async list(req, res) {
     const errors = validationResult(req);
 
-     const authHeader = req.get("Authorization");
+    const authHeader = req.get("Authorization");
 
-     const token = authHeader.split(" ")[1];
-     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
@@ -83,24 +83,12 @@ const UserController = {
   },
 
   // [GET] /api/popular-creator
-
-
   async popularCreator(req, res) {
-    
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
     try {
-
-        const authHeader = req.get("Authorization");
-
-        const token = authHeader.split(" ")[1];
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-
       const data = await User.aggregate([
-        {
-          $match: {
-            _id: { $ne: decodedToken?.id }, // Exclude your user by ID
-          },
-        },
         {
           $lookup: {
             from: "post",
@@ -171,8 +159,36 @@ const UserController = {
     }
   },
 
+  //[PUT] api/user/edit_profile
+  async editProfile(req, res) {
+    const authHeader = req.get("Authorization");
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const idUser = decodedToken.id;
 
+    //validate
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    
+    try {
+      const { firstName, lastName, avatar, phoneNumber } = req.body;
+      await User.findByIdAndUpdate(idUser, {
+        firstName,
+        lastName,
+        avatar,
+        phoneNumber,
+      });
 
+      return res.status(200).json({ msg: "Update user successfully" });
+    } catch (error) {
+      console.error(error.message);
+      return res
+        .status(500)
+        .json({ errors: [{ msg: "Internal server error" }] });
+    }
+  },
 
   // Upload endpoint
   upload(req, res) {
