@@ -544,21 +544,11 @@ const RecipeController = {
     if (!idUser) {
       return res.status(404).json({ error: "User not found" });
     }
-    const errors = validationResult(req);
-    if (!errors.isEmpty())
-      return res.status(400).json({ errors: errors.array() });
-
-    const options = {};
-    if (req.query.name) {
-      options.name = {
-        $regex: ".*" + req.query.name + ".*",
-      };
-    }
-
-    options.author = idUser;
 
     try {
-      const data = await Recipe.find(options).sort({ createdAt: "descending" });
+      const data = await Recipe.find({ author: idUser }).sort({
+        createdAt: -1,
+      });
       res.status(200).json({ msg: "get recipe list success", data });
     } catch (error) {
       return res.status(500).json({ errors: [{ msg: error }] });

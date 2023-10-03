@@ -23,7 +23,7 @@ let schema = new mongoose.Schema(
     ingredients: [
       {
         name: { type: String },
-        value: { type: String },
+        quantity: { type: String },
       },
     ],
     steps: [{ number: { type: Number }, content: { type: String } }],
