@@ -79,7 +79,7 @@ const ChatController = {
         data: {
           title: ` ${user?.lastName} ${user?.firstName} send to ${userReceive?.lastName} ${userReceive?.firstName} a message `,
           body: `You have a message from ${user?.lastName} ${user?.firstName}. Please check your message`,
-          avatarUserSend: userReceive?.avatar,
+          avatarUserSend: user?.avatar,
         },
         tokens: tokenDevices, // truyền mảng tokens
       };
