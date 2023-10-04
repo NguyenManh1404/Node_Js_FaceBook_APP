@@ -46,8 +46,8 @@ const ChatController = {
         return res.status(404).json({ error: "User not found" });
       }
       //Lấy thông tin user người nhận
-      const userFollower = await User.findById(idUserReceive);
-      if (!userFollower) {
+      const userReceive = await User.findById(idUserReceive);
+      if (!userReceive) {
         return res.status(404).json({ error: "User not found" });
       }
 
@@ -60,11 +60,11 @@ const ChatController = {
 
       /// Get Notification
       const message = {
-        notification: {
-          title: `${user?.firstName} send to  ${userFollower?.firstName} a message `,
-          body: `You have a message from ${user?.firstName}. Please check your message`,
-          imageUrl: "https://foo.bar.pizza-monster.png",
-        },
+        // notification: {
+        //   title: ` ${user?.lastName} ${user?.firstName} send to ${userReceive?.lastName} ${userReceive?.firstName} a message `,
+        //   body: `You have a message from ${user?.lastName} ${user?.firstName}. Please check your message`,
+        //   imageUrl: "https://foo.bar.pizza-monster.png",
+        // },
         android: {
           notification: {
             sound: "default",
@@ -75,6 +75,11 @@ const ChatController = {
           headers: {
             image: "https://foo.bar.pizza-monster.png",
           },
+        },
+        data: {
+          title: ` ${user?.lastName} ${user?.firstName} send to ${userReceive?.lastName} ${userReceive?.firstName} a message `,
+          body: `You have a message from ${user?.lastName} ${user?.firstName}. Please check your message`,
+          avatarUserSend: userReceive?.avatar,
         },
         tokens: tokenDevices, // truyền mảng tokens
       };
@@ -190,9 +195,8 @@ const ChatController = {
           image: "https://foo.bar.pizza-monster.png",
         },
       },
-      //  token:"cLpYNZUbTK-P0GrPAV3CIy:APA91bHF96jyP-E1e9Z357rCQVmujHrh5Wi04kOOtajPTy7FxvhwC5kVRhWM0lIOPA-nBfkQTld8HwbzvIQeFNdUCqIsNjZ4Brei1UlBhixdM3Yy10DmZvtyEO7e5uXyLnnv8iy5iw2J"
       token:
-        "fzvSDWuS1UD9gmp1nMaSyr:APA91bGJa01zpwuM65X0KgBctzeOUDzFD7rgw_j0n34yRI3IlYTsn0ExpYfVsq9UikzuWuc9brVDver_w8YGa7KAu6LUYSfx9BIfP02I8BtOurzPGDjhkVwgp24S3yZ9MX2G00tUt9uk",
+        "e33u0NrmTbqCgVMxTPgY_2:APA91bGq0msLVMjjkfZyyX5Pa84-cntrxFshtzijDEQbqCiAI48dq-Ylde-xNImSwHuidQS9mMRR-ggVrqDI6bfvX6NCLuUt3Mr-l97hCQOP45vrTWBQnkrBEw3ezxCSJj2eYfOQ_XLz",
     };
 
     admin
@@ -205,7 +209,7 @@ const ChatController = {
         console.log("Error sending message:", error);
       });
 
-    return res.json({ name: "Hug Manh", password: "get notify" });
+    return res.json({ name: "Hug Manh", password: "get notifys" });
   },
 
   async getNotificationFollower(req, res) {

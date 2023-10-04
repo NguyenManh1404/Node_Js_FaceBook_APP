@@ -25,9 +25,14 @@ const NotificationController = {
          image: "https://foo.bar.pizza-monster.png",
        },
      },
+     data: {
+       title: " Message",
+       body: "Manh",
+       largeIcon:'https://st.depositphotos.com/11440342/54489/i/450/depositphotos_544892728-stock-photo-beautiful-woman-retro-camera-autumn.jpg',
+     },
      //  token:"cLpYNZUbTK-P0GrPAV3CIy:APA91bHF96jyP-E1e9Z357rCQVmujHrh5Wi04kOOtajPTy7FxvhwC5kVRhWM0lIOPA-nBfkQTld8HwbzvIQeFNdUCqIsNjZ4Brei1UlBhixdM3Yy10DmZvtyEO7e5uXyLnnv8iy5iw2J"
      token:
-       "fzvSDWuS1UD9gmp1nMaSyr:APA91bGJa01zpwuM65X0KgBctzeOUDzFD7rgw_j0n34yRI3IlYTsn0ExpYfVsq9UikzuWuc9brVDver_w8YGa7KAu6LUYSfx9BIfP02I8BtOurzPGDjhkVwgp24S3yZ9MX2G00tUt9uk",
+       "e33u0NrmTbqCgVMxTPgY_2:APA91bGq0msLVMjjkfZyyX5Pa84-cntrxFshtzijDEQbqCiAI48dq-Ylde-xNImSwHuidQS9mMRR-ggVrqDI6bfvX6NCLuUt3Mr-l97hCQOP45vrTWBQnkrBEw3ezxCSJj2eYfOQ_XLz",
    };
 
    admin
