@@ -1,6 +1,7 @@
 const User = require("../../models/User");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt"); // thư viện để Hash password
+const fetch = require("node-fetch");
 
 const AuthController = {
   // [POST] /api/auth/register
