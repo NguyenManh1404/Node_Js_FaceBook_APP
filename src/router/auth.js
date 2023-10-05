@@ -7,8 +7,9 @@ const router = express.Router(); //import
 const AuthController = require("../app/controllers/AuthController");
 
 const validator = require("../validation/users");
-
+router.get("/get_per_page", AuthController.getPerPage);
 // router.post('/api/upload', uploadCloud.single('file'), PostController.store);
 router.post("/register", validator.register, AuthController.register);
+
 
 module.exports = router;

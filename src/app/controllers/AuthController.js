@@ -72,6 +72,54 @@ const AuthController = {
         .json({ errors: [{ msg: "Internal server error", error }] });
     }
   },
+
+  //GET api/auth/get_per_page
+
+  getPerPage(req, res) {
+    const apiUrl = "https://6514fb42dc3282a6a3cdb0e1.mockapi.io/users";
+
+    // Make a GET request to the API using fetch
+    fetch(apiUrl)
+      .then((response) => {
+        // Check if the response status is OK (status code 200)
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        // Parse the response as JSON
+        return response.json();
+      })
+      .then((data) => {
+        // Handle the data
+        console.log(data);
+
+        const { page, perPage } = req?.body;
+        // console.log(
+        //   "🚀 ~ file: AuthController.js:96 ~ .then ~ page:",
+        //   page,
+        //   perPage
+        // );
+
+        const startIndex = (page - 1) * perPage;
+        const endIndex = startIndex + perPage;
+
+        const paginatedData = data.slice(startIndex, endIndex);
+
+        //res
+        return res.status(200).json({
+          msg: "Get  successfully",
+          data: paginatedData,
+          page: page,
+          perPage: perPage,
+          totalItem: data?.length
+        });
+       
+      })
+      .catch((error) => {
+        return res
+          .status(500)
+          .json({ errors: [{ msg: "Internal server error", error }] });
+      });
+  },
 };
 
 module.exports = AuthController;
