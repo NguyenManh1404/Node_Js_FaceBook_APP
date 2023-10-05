@@ -109,7 +109,7 @@ const AuthController = {
         //res
         return res.status(200).json({
           msg: "Get  successfully",
-          data: paginatedData,
+          items: paginatedData,
           page: page,
           perPage: perPage,
           totalItem: data?.length
