@@ -92,14 +92,8 @@ const AuthController = {
       })
       .then((data) => {
         // Handle the data
-        console.log(data);
 
         const { page, perPage } = req?.query; 
-        // console.log(
-        //   "🚀 ~ file: AuthController.js:96 ~ .then ~ page:",
-        //   page,
-        //   perPage
-        // );
 
         const startIndex = (page - 1) * perPage;
         const endIndex = startIndex + perPage;
@@ -110,8 +104,8 @@ const AuthController = {
         return res.status(200).json({
           msg: "Get  successfully",
           data: paginatedData,
-          page: page,
-          perPage: perPage,
+          page: Number(page),
+          perPage: Number(perPage),
           totalItem: data?.length
         });
        
