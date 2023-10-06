@@ -94,7 +94,7 @@ const AuthController = {
         // Handle the data
         console.log(data);
 
-        const { page, perPage } = req?.body;
+        const { page, perPage } = req?.query; 
         // console.log(
         //   "🚀 ~ file: AuthController.js:96 ~ .then ~ page:",
         //   page,
