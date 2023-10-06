@@ -95,8 +95,8 @@ const AuthController = {
 
         const { page, perPage } = req?.query; 
 
-        const startIndex = (page - 1) * perPage;
-        const endIndex = startIndex + perPage;
+        const startIndex = ( Number(page) - 1) *  Number(perPage);
+        const endIndex =  Number(startIndex) +  Number(perPage);
 
         const paginatedData = data.slice(startIndex, endIndex);
 
