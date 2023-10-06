@@ -107,7 +107,13 @@ const AuthController = {
         const paginatedData = data.slice(startIndex, endIndex);
 
         //res
-        return res.status(200).json(paginatedData);
+        return res.status(200).json({
+          msg: "Get  successfully",
+          data: paginatedData,
+          page: page,
+          perPage: perPage,
+          totalItem: data?.length
+        });
        
       })
       .catch((error) => {
