@@ -40,6 +40,8 @@ const uploadMiddleware = multer({
   //log request on terminal
   app.use(morgan("tiny"));
 
+  
+await app.use(express.json());
   //mongodb connection
   await connectDB();
   //parse request to body-parser

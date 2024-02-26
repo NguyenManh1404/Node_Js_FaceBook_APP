@@ -178,12 +178,46 @@ const ChatController = {
 
   //[GET] api/notification/pushNotification
   async getNotification(req, res) {
+    // const message = {
+    //   notification: {
+    //     title: "Dẹmo",
+    //     body: "Body demo",
+    //     imageUrl: "https://foo.bar.pizza-monster.png",
+    //   },
+    //   android: {
+    //     notification: {
+    //       sound: "default",
+    //       imageUrl: "https://foo.bar.pizza-monster.png",
+    //     },
+    //   },
+    //   webpush: {
+    //     headers: {
+    //       image: "https://foo.bar.pizza-monster.png",
+    //     },
+    //   },
+    //   token: [
+    //     "eF2b7b3PQUJ_nYohAiC9zi:APA91bF8r_vZz2D-qKXY6xtBps6jmF_ToqY66vg0-P8amS2mn-jJvOjhwy6SazHaRjIcRTNic2HqwEnqPD-lnc-Kvk-tUl-oEHRBRncG3wb4BMbiRmlGclLYrTRZMqZaIbDZ9Mx1TPYC",
+    //     "ctg9WpyhRwmSFh8m8K_OjR:APA91bFyN0TVmbZHWwh-vJ4E7vuOMIE3uBH3Z966vNHoJObZ6hCBASBKGnyYfBdMTnx1JHKLDPy9TKXzUxxj_Xz81q4r04YuUEZw4de-oG0aEZoEkyc0G1QKo1KWPoneykk-yI6ySqKK",
+    //   ],
+    // };
+
+    // admin
+    //   .messaging()
+    //   .send(message)
+    //   .then((response) => {
+    //     console.log("Message sent successfully:", response);
+    //   })
+    //   .catch((error) => {
+    //     console.log("Error sending message:", error);
+    //   });
+
+    /// Get Notification
     const message = {
-      notification: {
-        title: "Dẹmo",
-        body: "Body demo",
-        imageUrl: "https://foo.bar.pizza-monster.png",
-      },
+      // notification: {
+      //   title: ` ${user?.lastName} ${user?.firstName} send to ${userReceive?.lastName} ${userReceive?.firstName} a message `,
+      //   body: `You have a message from ${user?.lastName} ${user?.firstName}. Please check your message`,
+      //   imageUrl: "https://foo.bar.pizza-monster.png",
+      // },
       android: {
         notification: {
           sound: "default",
@@ -195,13 +229,19 @@ const ChatController = {
           image: "https://foo.bar.pizza-monster.png",
         },
       },
-      token:
-        "e33u0NrmTbqCgVMxTPgY_2:APA91bGq0msLVMjjkfZyyX5Pa84-cntrxFshtzijDEQbqCiAI48dq-Ylde-xNImSwHuidQS9mMRR-ggVrqDI6bfvX6NCLuUt3Mr-l97hCQOP45vrTWBQnkrBEw3ezxCSJj2eYfOQ_XLz",
+      data: {
+        title: ` ${user?.lastName} ${user?.firstName} send to ${userReceive?.lastName} ${userReceive?.firstName} a message `,
+        body: `You have a message from ${user?.lastName} ${user?.firstName}. Please check your message`,
+        avatarUserSend: user?.avatar,
+      },
+      tokens: [
+        "eF2b7b3PQUJ_nYohAiC9zi:APA91bF8r_vZz2D-qKXY6xtBps6jmF_ToqY66vg0-P8amS2mn-jJvOjhwy6SazHaRjIcRTNic2HqwEnqPD-lnc-Kvk-tUl-oEHRBRncG3wb4BMbiRmlGclLYrTRZMqZaIbDZ9Mx1TPYC",
+      ],
     };
 
-    admin
+    await admin
       .messaging()
-      .send(message)
+      .sendEachForMulticast(message)
       .then((response) => {
         console.log("Message sent successfully:", response);
       })

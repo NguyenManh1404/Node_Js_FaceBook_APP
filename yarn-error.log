@@ -1,0 +1,71 @@
+Arguments: 
+  /Users/manh.nguyen/.nvm/versions/node/v16.13.0/bin/node /opt/homebrew/Cellar/yarn/1.22.19/libexec/bin/yarn.js
+
+PATH: 
+  /opt/homebrew/bin:/Users/manh.nguyen/.nvm/versions/node/v16.13.0/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/opt/homebrew/bin:/Users/manh.nguyen/.nvm/versions/node/v16.13.0/bin:/Users/manh.nguyen/Library/Android/sdk/emulator:/Users/manh.nguyen/Library/Android/sdk/platform-tools:/Users/manh.nguyen/Library/Android/idk/tools:/Users/manh.nguyen/Library/Android/idk/tools/bin:/Applications/Visual Studio Code.app/Contents/Resources/app/bin:/Users/manh.nguyen/Library/Android/sdk/emulator:/Users/manh.nguyen/Library/Android/sdk/platform-tools:/Users/manh.nguyen/Library/Android/idk/tools:/Users/manh.nguyen/Library/Android/idk/tools/bin:/Applications/Visual Studio Code.app/Contents/Resources/app/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  16.13.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  SyntaxError: /Users/manh.nguyen/Desktop/Node_Js_FaceBook_APP/package.json: Unexpected token / in JSON at position 117
+      at JSON.parse (<anonymous>)
+      at /opt/homebrew/Cellar/yarn/1.22.19/libexec/lib/cli.js:1629:59
+      at Generator.next (<anonymous>)
+      at step (/opt/homebrew/Cellar/yarn/1.22.19/libexec/lib/cli.js:310:30)
+      at /opt/homebrew/Cellar/yarn/1.22.19/libexec/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "backend",
+    "version": "1.0.0",
+    "main": "src/index.js",
+    "author": "hungmanh",
+    "license": "MIT",
+    // "engines": {
+    //   "node": "20.x"
+    // },
+    "scripts": {
+      "start": "nodemon src/index.js"
+    },
+    "dependencies": {
+      "@admin-bro/design-system": "^1.7.3",
+      "@admin-bro/express": "^3.1.0",
+      "@admin-bro/mongoose": "^1.1.0",
+      "admin-bro": "^4.0.1",
+      "bcrypt": "^5.1.0",
+      "body-parser": "1.20.0",
+      "cloudinary": "1.30.0",
+      "const": "^1.0.0",
+      "dotenv": "16.0.1",
+      "express": "4.18.1",
+      "express-formidable": "^1.2.0",
+      "express-handlebars": "^7.0.2",
+      "express-session": "^1.17.3",
+      "express-validator": "6.14.2",
+      "firebase-admin": "^11.6.0",
+      "jsonwebtoken": "8.5.1",
+      "mongoose": "6.4.0",
+      "morgan": "1.10.0",
+      "multer": "^1.4.5-lts.1",
+      "multer-storage-cloudinary": "^4.0.0",
+      "nodemailer": "^6.9.1",
+      "nodemailer-express-handlebars": "^6.1.0",
+      "nodemon": "2.0.16",
+      "passport": "^0.6.0",
+      "react-dropzone": "^14.2.3",
+      "swagger-ui-express": "^4.6.3"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
