@@ -130,17 +130,16 @@ const AuthController = {
         });
 
         return res.status(200).json({
-          data: { user: user, isFromForgotPassword: isFromForgotPassword || false},
+          data: {
+            user: user,
+            isFromForgotPassword: isFromForgotPassword || false,
+          },
           message: "Verify account successfully",
         });
       } else {
-        return res
-          .status(401)
-          .json({
-            errors: [
-              { message: "Mail verification code or Email is not match" },
-            ],
-          });
+        return res.status(401).json({
+          errors: [{ message: "Mail verification code or Email is not match" }],
+        });
       }
     } catch (error) {
       return res
@@ -292,7 +291,7 @@ const AuthController = {
         } else {
           return res.json({
             message: `We have sent a verify email link to ${email}`,
-            email: email
+            email: email,
           });
         }
       });
@@ -330,12 +329,50 @@ const AuthController = {
 
       await User.findByIdAndUpdate(user?.id, { password: hashedPassword });
 
-      return res.json({ message: "Password was reset successfully", data: user });
+      return res.json({
+        message: "Password was reset successfully",
+        data: user,
+      });
     } catch (error) {
       console.error(error.message);
       return res
         .status(500)
         .json({ errors: [{ message: "Internal server error" }] });
+    }
+  },
+
+  async loginSimple(req, res) {
+    const defaultUser = {
+      email: "manh@gmail.com",
+      password: "manh123",
+    };
+
+    try {
+      const { password, email } = req.body;
+
+      // user not found
+      if (email !== defaultUser?.email) {
+        return res
+          .status(400)
+          .json({ errors: { message: "User do not exist" } });
+      }
+      // password is not match
+      if (password !== defaultUser?.password) {
+        return res
+          .status(400)
+          .json({ errors: { message: "Password is not match" } });
+      }
+
+      return res.status(200).json({
+        data: {
+          users: defaultUser,
+          message: "Login successful",
+        },
+      });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ errors: { message: "Internal server error" } });
     }
   },
 

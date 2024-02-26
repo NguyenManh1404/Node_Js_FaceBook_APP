@@ -11,6 +11,7 @@ const validator = require("../validation/users");
 router.post("/register", validator.register, AuthController.register);
 router.post("/verify", validator.verifyEmail, AuthController.verifyEmail);
 router.post("/login", validator.login, AuthController.login);
+router.post("/login-simple", AuthController.loginSimple);
 router.get("/getAuth", AuthController.getAuth);
 router.post(
   "/requestCodeVerifyEmail",
