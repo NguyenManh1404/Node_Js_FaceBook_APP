@@ -353,13 +353,13 @@ const AuthController = {
       // user not found
       if (email !== defaultUser?.email) {
         return res
-          .status(400)
+          .status(200)
           .json({ errors: { message: "User do not exist" } });
       }
       // password is not match
       if (password !== defaultUser?.password) {
         return res
-          .status(400)
+          .status(200)
           .json({ errors: { message: "Password is not match" } });
       }
 
